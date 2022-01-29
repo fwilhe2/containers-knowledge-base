@@ -9,10 +9,17 @@ Collection of knowledge on containers 🐋📦
 
 [cgroups](https://en.wikipedia.org/wiki/Cgroups)
 
+- [image-spec](https://github.com/opencontainers/image-spec)
+- [distribution-spec](https://github.com/opencontainers/distribution-spec)
+- [runtime-spec](https://github.com/opencontainers/runtime-spec)
+
+
 ## Software
 
-* Docker
-* Podman
-* containerd
-* runc
-* crun
+* [Docker](https://github.com/docker/cli)
+* [Podman](https://github.com/containers/podman)
+* [CRI-O](https://github.com/cri-o/cri-o)
+* [bubblewrap](https://github.com/containers/bubblewrap)/flatpak
+* [containerd](https://github.com/containerd/containerd)
+* [runc](https://github.com/opencontainers/runc)
+* [crun](https://github.com/containers/crun)
