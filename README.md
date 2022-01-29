@@ -9,6 +9,8 @@ Collection of knowledge on containers 🐋📦
 
 [cgroups](https://en.wikipedia.org/wiki/Cgroups)
 
+Copy-on-write filesystems
+
 - [image-spec](https://github.com/opencontainers/image-spec)
 - [distribution-spec](https://github.com/opencontainers/distribution-spec)
 - [runtime-spec](https://github.com/opencontainers/runtime-spec)
@@ -21,5 +23,12 @@ Collection of knowledge on containers 🐋📦
 * [CRI-O](https://github.com/cri-o/cri-o)
 * [bubblewrap](https://github.com/containers/bubblewrap)/flatpak
 * [containerd](https://github.com/containerd/containerd)
+* [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
 * [runc](https://github.com/opencontainers/runc)
 * [crun](https://github.com/containers/crun)
+
+## Talks
+
+[Containers at Facebook - Lindsay Salisbury](https://youtu.be/_Qc9jBk18w8)
+
+systemd, BTRFS, ...
