@@ -15,7 +15,6 @@ Copy-on-write filesystems
 - [distribution-spec](https://github.com/opencontainers/distribution-spec)
 - [runtime-spec](https://github.com/opencontainers/runtime-spec)
 
-
 ## Software
 
 * [Docker](https://github.com/docker/cli)
@@ -26,6 +25,16 @@ Copy-on-write filesystems
 * [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
 * [runc](https://github.com/opencontainers/runc)
 * [crun](https://github.com/containers/crun)
+
+## Container Images
+
+### Building Images
+
+#### Dockerfile/Containerfile
+
+Layering, Builder Pattern, Multi-Arch builds
+
+## Running Containers
 
 ## Talks
 
