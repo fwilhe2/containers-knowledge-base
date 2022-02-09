@@ -8,18 +8,6 @@
         state: directory
         mode: "750"
 
-    - name: Clone personal git repos
-      ansible.builtin.git:
-        repo: "{{ item }}"
-        dest: '~/code/{{ item | urlsplit("path") }}'
-      tags: personal
-      loop:
-        - https://github.com/fwilhe2/containers-knowledge-base
-        - https://github.com/fwilhe2/distroless
-        - https://github.com/fwilhe2/Inzell
-        - https://github.com/fwilhe2/silverblue-system-config
-        - https://github.com/fwilhe2/system-automation-lite
-
     - name: Create ~/code/oci Directory
       file:
         path: ~/code/oci
@@ -127,3 +115,17 @@
         - go-md2man
       become: true
       when: ansible_os_family == 'Debian'
+
+
+    - name: Build runc
+      community.general.make:
+        chdir: ~/code/oci/opencontainers/runc
+
+    - name: Build skopeo
+      community.general.make:
+        chdir: ~/code/oci/containers/skopeo
+
+    - name: Build gvisor
+      community.general.make:
+        chdir: ~/code/oci/google/gvisor
+        target: runsc
