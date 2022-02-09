@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install test dependencies.
+      run: sudo pip3 install ansible
+    - run: ansible-playbook playbook.yaml
     - name: Hello World
       run: |
         docker run hello-world
