@@ -18,6 +18,7 @@
       ansible.builtin.git:
         repo: "{{ item }}"
         dest: '~/code/oci/{{ item | urlsplit("path") }}'
+        depth: 1
       tags: containers
       loop:
         - https://github.com/ahamlinman/zeroimage
@@ -117,15 +118,35 @@
       when: ansible_os_family == 'Debian'
 
 
-    - name: Build runc
-      community.general.make:
-        chdir: ~/code/oci/opencontainers/runc
+    # - name: Build runc
+    #   community.general.make:
+    #     chdir: ~/code/oci/opencontainers/runc
 
-    - name: Build skopeo
-      community.general.make:
-        chdir: ~/code/oci/containers/skopeo
+    # - name: Build skopeo
+    #   community.general.make:
+    #     chdir: ~/code/oci/containers/skopeo
 
     - name: Build gvisor
       community.general.make:
         chdir: ~/code/oci/google/gvisor
         target: runsc
+
+
+    - name: Install build dependencies for youki
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - pkg-config
+        - libsystemd-dev
+        - libdbus-glib-1-dev
+        - build-essential
+        - libelf-dev
+        - libseccomp-dev
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Build youki
+      ansible.builtin.shell:
+        cmd: bash build.sh
+        chdir: ~/code/oci/containers/youki
