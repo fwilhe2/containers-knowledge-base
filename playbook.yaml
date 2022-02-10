@@ -2,22 +2,22 @@
 - hosts: localhost
 
   tasks:
-    - name: Create ~/code Directory
+    - name: Create /home/runner/work/containers-knowledge-base/containers-knowledge-base/code Directory
       file:
-        path: ~/code
+        path: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code
         state: directory
         mode: "750"
 
-    - name: Create ~/code/oci Directory
+    - name: Create /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci Directory
       file:
-        path: ~/code/oci
+        path: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci
         state: directory
         mode: "750"
 
     - name: Clone container-related git repos
       ansible.builtin.git:
         repo: "{{ item }}"
-        dest: '~/code/oci/{{ item | urlsplit("path") }}'
+        dest: '/home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci/{{ item | urlsplit("path") }}'
         depth: 1
       tags: containers
       loop:
