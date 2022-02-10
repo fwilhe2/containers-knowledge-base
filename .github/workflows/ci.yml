@@ -21,4 +21,4 @@ jobs:
       run: sudo pip3 install ansible
 
     - name: Run containers demo playbook
-      run: ansible-playbook playbook.yaml
+      run: ansible-playbook -v playbook.yaml

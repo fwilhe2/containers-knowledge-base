@@ -37,6 +37,7 @@
         - https://github.com/containers/bubblewrap
         - https://github.com/containers/buildah
         - https://github.com/containers/crun
+        - https://github.com/containers/gvisor-tap-vsock
         - https://github.com/containers/krunvm
         - https://github.com/containers/libkrun
         - https://github.com/containers/oci-spec-rs
@@ -65,7 +66,6 @@
         - https://github.com/mafintosh/mkcontainer
         - https://github.com/mafintosh/raspberry-pi-container
         - https://github.com/mhausenblas/cinf
-        - https://github.com/moby/buildkit
         - https://github.com/moby/buildkit
         - https://github.com/moby/libnetwork
         - https://github.com/moby/moby
