@@ -22,3 +22,22 @@ jobs:
 
     - name: Run containers demo playbook
       run: ansible-playbook -v playbook.yaml
+
+    - name: Build runc
+      working-directory: code/oci/opencontainers/runc
+      run: make
+
+    - name: Build skopeo
+      working-directory: code/oci/containers/skopeo
+      run: make
+
+    - name: Build gvisor
+      working-directory: code/oci/google/gvisor
+      run: |
+        mkdir -p bin
+        make copy TARGETS=runsc DESTINATION=bin/
+        sudo cp ./bin/runsc /usr/local/bin
+
+    - name: Build youki
+      working-directory: code/oci/containers/youki
+      run: bash build.sh
