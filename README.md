@@ -8,6 +8,7 @@ Collection of knowledge on containers 🐋📦
 - [Containers Resources](https://github.com/cloudfoundry/garden-runc-release/wiki/Containers-Resources)
 - [Awesome Linux Containers](https://github.com/Friz-zy/awesome-linux-containers)
 - [Awesome Immutable](https://github.com/castrojo/awesome-immutable)
+- [What Is a Standard Container (2021 edition)](https://iximiuz.com/en/posts/oci-containers/)
 
 ### [Namespaces](https://en.wikipedia.org/wiki/Linux_namespaces)
 
