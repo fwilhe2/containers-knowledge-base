@@ -8,6 +8,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Hello World
+
+    - name: Hello World (docker)
       run: |
         docker run hello-world
+
+    - name: Hello World (podman)
+      run: |
+        podman run hello-world
+
+    - name: Install ansible
+      run: sudo pip3 install ansible
+
+    - name: Run containers demo playbook
+      run: ansible-playbook -v playbook.yml
+
+    # - name: Build runc
+    #   working-directory: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci/opencontainers/runc
+    #   run: make
+
+    # - name: Build skopeo
+    #   working-directory: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci/containers/skopeo
+    #   run: make
+
+    # - name: Build gvisor
+    #   working-directory: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci/google/gvisor
+    #   run: |
+    #     mkdir -p bin
+    #     make copy TARGETS=runsc DESTINATION=bin/
+    #     sudo cp ./bin/runsc /usr/local/bin
+
+    # - name: Build youki
+    #   working-directory: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci/containers/youki
+    #   run: bash build.sh
