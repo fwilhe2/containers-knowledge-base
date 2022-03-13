@@ -1,23 +1,23 @@
 ---
-- hosts: localhost
+- hosts: all
 
   tasks:
-    - name: Create /home/runner/work/containers-knowledge-base/containers-knowledge-base/code Directory
+    - name: Create code Directory
       file:
-        path: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code
+        path: code
         state: directory
         mode: "750"
 
-    - name: Create /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci Directory
+    - name: Create ~/code/oci Directory
       file:
-        path: /home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci
+        path: ~/code/oci
         state: directory
         mode: "750"
 
     - name: Clone container-related git repos
       ansible.builtin.git:
         repo: "{{ item }}"
-        dest: '/home/runner/work/containers-knowledge-base/containers-knowledge-base/code/oci/{{ item | urlsplit("path") }}'
+        dest: '~/code/oci/{{ item | urlsplit("path") }}'
         depth: 1
       tags: containers
       loop:
@@ -46,7 +46,7 @@
         - https://github.com/containers/podman
         - https://github.com/containers/podman-compose
         - https://github.com/containers/skopeo
-        - https://github.com/containers/youki
+        # - https://github.com/containers/youki
         - https://github.com/crazy-max/undock
         - https://github.com/distribution/distribution
         - https://github.com/docker/buildx
@@ -101,6 +101,7 @@
         state: present
         name: "{{ item }}"
       loop:
+        - golang
         - libseccomp2
         - libseccomp-dev
       become: true
