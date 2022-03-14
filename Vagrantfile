@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
       ansible.playbook = "playbook.yaml"
       ansible.compatibility_mode = "2.0"
       ansible.raw_arguments = [
-          '-vv'
+          '-vvvv'
       ]
   end
 end
