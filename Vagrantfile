@@ -20,4 +20,10 @@ Vagrant.configure(2) do |config|
           '-vvvv'
       ]
   end
+
+  config.vm.provision :shell do |shell|
+    shell.privileged = true
+    shell.inline = 'echo rebooting after provisioning'
+    shell.reboot = true
+  end
 end
