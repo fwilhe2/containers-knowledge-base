@@ -9,12 +9,6 @@ jobs:
     container: ubuntu:21.10
     steps:
     - uses: actions/checkout@v2
-    - name: Hello World (docker)
-      run: |
-        docker run hello-world
-    - name: Hello World (podman)
-      run: |
-        podman run hello-world
     - name: Run demo playbook
       run: |
         ansible-playbook --inventory "localhost," --connection=local playbook.yaml
