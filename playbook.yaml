@@ -1,0 +1,158 @@
+---
+- hosts: all
+
+  vars:
+    home: "{{ lookup('env', 'HOME') }}"
+
+  tasks:
+    - name: Create ~/code Directory
+      file:
+        path: "{{ home }}/code"
+        state: directory
+        mode: "750"
+
+    - name: Clone container-related git repos
+      ansible.builtin.git:
+        repo: "{{ item }}"
+        dest: '{{ home }}/code/{{ item | urlsplit("path") }}'
+        depth: 1
+      tags: containers
+      loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
+
+    - name: Install systemd-container
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - systemd-container
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install build dependencies for runc
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - golang
+        - libseccomp2
+        - libseccomp-dev
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install build dependencies for crun
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - make
+        - git
+        - gcc
+        - build-essential
+        - pkgconf
+        - libtool
+        - libsystemd-dev
+        - libprotobuf-c-dev
+        - libcap-dev
+        - libseccomp-dev
+        - libyajl-dev
+        - go-md2man
+        - autoconf
+        - python3
+        - automake
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install build dependencies for skopeo
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - libdevmapper-dev
+        - libgpgme-dev
+        - go-md2man
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install build dependencies for youki
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - pkg-config
+        - libsystemd-dev
+        - libdbus-glib-1-dev
+        - build-essential
+        - libelf-dev
+        - libseccomp-dev
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install build dependencies for containerd
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - libbtrfs-dev
+        - btrfs-progs
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Build runc
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/runc"
+
+    - name: Install runc
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/runc"
+        target: install
+
+    - name: configue crun
+      ansible.builtin.shell: ./autogen.sh && ./configure
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/crun"
+
+    - name: Build crun
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/crun"
+
+    - name: Install crun
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/crun"
+        target: install
+
+    - name: Build containerd
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/containerd"
+
+    - name: Build CNI plugins
+      ansible.builtin.shell: ./build_linux.sh
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/plugins"
+
+    - name: Install containerd
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/containerd"
+        target: install
+
+    # - name: Build docker cli
+    #   community.general.make:
+    #     chdir: ~/code/docker/cli
+    #     target: binary
+
+    - name: Build skopeo
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/skopeo"
+
+    - name: Install skopeo
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/skopeo"
+        target: install
+
+    # - name: Build gvisor
+    #   community.general.make:
+    #     chdir: ~/code/google/gvisor
+    #     target: runsc

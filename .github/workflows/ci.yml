@@ -6,8 +6,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: ubuntu:21.10
     steps:
-    - uses: actions/checkout@v2
-    - name: Hello World
-      run: |
-        docker run hello-world
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential
+      - name: Run demo playbook
+        run: ansible-playbook -vvv --inventory "localhost," --connection=local playbook.yaml
+      - run: runc --version
+      - run: containerd --version
+      - run: skopeo --version
+      - run: crun --version
