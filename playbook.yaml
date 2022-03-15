@@ -1,17 +1,20 @@
 ---
 - hosts: all
 
+  vars:
+    home: "{{ lookup('env', 'HOME') }}"
+
   tasks:
     - name: Create ~/code Directory
       file:
-        path: ~/code
+        path: "{{ home }}/code"
         state: directory
         mode: "750"
 
     - name: Clone container-related git repos
       ansible.builtin.git:
         repo: "{{ item }}"
-        dest: '~/code/{{ item | urlsplit("path") }}'
+        dest: '{{ home }}/code/{{ item | urlsplit("path") }}'
         depth: 1
       tags: containers
       loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
@@ -73,27 +76,27 @@
 
     - name: Build runc
       community.general.make:
-        chdir: ~/code/fwilhe-containers/runc
+        chdir: "{{ home }}/code/fwilhe-containers/runc"
 
     - name: Install runc
       become: true
       community.general.make:
-        chdir: /home/vagrant/code/fwilhe-containers/runc
+        chdir: "{{ home }}/code/fwilhe-containers/runc"
         target: install
 
     - name: Build containerd
       community.general.make:
-        chdir: ~/code/fwilhe-containers/containerd
+        chdir: "{{ home }}/code/fwilhe-containers/containerd"
 
     - name: Build CNI plugins
       ansible.builtin.shell: ./build_linux.sh
       args:
-        chdir: ~/code/fwilhe-containers/plugins
+        chdir: "{{ home }}/code/fwilhe-containers/plugins"
 
     - name: Install containerd
       become: true
       community.general.make:
-        chdir: /home/vagrant/code/fwilhe-containers/containerd
+        chdir: "{{ home }}/code/fwilhe-containers/containerd"
         target: install
 
     # - name: Build docker cli
@@ -103,12 +106,12 @@
 
     - name: Build skopeo
       community.general.make:
-        chdir: ~/code/fwilhe-containers/skopeo
+        chdir: "{{ home }}/code/fwilhe-containers/skopeo"
 
     - name: Install skopeo
       become: true
       community.general.make:
-        chdir: /home/vagrant/code/fwilhe-containers/skopeo
+        chdir: "{{ home }}/code/fwilhe-containers/skopeo"
         target: install
 
     # - name: Build gvisor
