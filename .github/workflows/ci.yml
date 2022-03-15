@@ -12,5 +12,8 @@ jobs:
     - name: Install dependencies
       run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential
     - name: Run demo playbook
-      run: |
-        ansible-playbook -vvv --inventory "localhost," --connection=local playbook.yaml
+      run: ansible-playbook -vvv --inventory "localhost," --connection=local playbook.yaml
+    - run: runc --version
+    - run: containerd --version
+    - run: skopeo --version
+    - run: crun --version

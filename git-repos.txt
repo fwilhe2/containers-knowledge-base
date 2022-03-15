@@ -3,3 +3,4 @@ https://github.com/fwilhe-containers/containerd
 https://github.com/fwilhe-containers/skopeo
 https://github.com/fwilhe-containers/cni
 https://github.com/fwilhe-containers/plugins
+https://github.com/fwilhe-containers/crun
