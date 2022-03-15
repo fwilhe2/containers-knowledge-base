@@ -47,6 +47,12 @@ Layering, Builder Pattern, Multi-Arch builds
 
 ### [Rootless Containers](https://rootlesscontaine.rs/)
 
+## Playground Environment
+
+[`Vagrantfile`](./Vagrantfile) provides a reproducible development environment built via [an Ansible playbook](./playbook.yaml).
+
+So far there is not much to see there, but the vision is to produce an environment with all needs to tinker with container software, to change it and to learn about it.
+
 ## Talks
 
 [Containers at Facebook - Lindsay Salisbury](https://youtu.be/_Qc9jBk18w8)
