@@ -11,3 +11,6 @@ jobs:
     - name: Hello World
       run: |
         docker run hello-world
+    - name: Hello World
+      run: |
+        ansible-playbook --inventory "localhost," --connection=local playbook.yaml
