@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      run: apt-get update && apt-get install -yqq ansible git
+      run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git
     - name: Run demo playbook
       run: |
         ansible-playbook --inventory "localhost," --connection=local playbook.yaml
