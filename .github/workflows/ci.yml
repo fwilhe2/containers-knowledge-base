@@ -19,4 +19,4 @@ jobs:
       - run: crun --version
       - run: podman --version
       - run: crio --version
-      - run: find code/fwilhe-containers
+      - run: find ~/code/fwilhe-containers/container-image
