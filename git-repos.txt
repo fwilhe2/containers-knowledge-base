@@ -6,3 +6,4 @@ https://github.com/fwilhe-containers/plugins
 https://github.com/fwilhe-containers/crun
 https://github.com/fwilhe-containers/podman
 https://github.com/fwilhe-containers/cri-o
+https://github.com/fwilhe-containers/container-image
