@@ -1,6 +1,7 @@
 https://github.com/fwilhe-containers/bubblewrap
 https://github.com/fwilhe-containers/cni
 https://github.com/fwilhe-containers/conmon
+https://github.com/fwilhe-containers/container-image
 https://github.com/fwilhe-containers/containerd
 https://github.com/fwilhe-containers/cri-o
 https://github.com/fwilhe-containers/crun

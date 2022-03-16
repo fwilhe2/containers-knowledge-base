@@ -23,3 +23,4 @@ jobs:
       - run: runc --version
       - run: runsc --version
       - run: skopeo --version
+      - run: find ~/code/fwilhe-containers/container-image

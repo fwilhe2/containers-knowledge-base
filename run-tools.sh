@@ -19,3 +19,9 @@ echo "::endgroup::"
 echo "::group::Podman Hello"
 podman run quay.io/podman/hello
 echo "::endgroup::"
+
+pushd ~/code/fwilhe-containers/container-image
+nc -lkU mySocket.sock &
+crun create --console-socket=mySocket.sock myContainer
+crun list
+popd
