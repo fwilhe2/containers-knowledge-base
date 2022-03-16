@@ -156,3 +156,23 @@
     #   community.general.make:
     #     chdir: ~/code/google/gvisor
     #     target: runsc
+
+    - name: Build cri-o
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/cri-o"
+
+    - name: Install cri-o
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/cri-o"
+        target: install
+
+    - name: Build podman
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/podman"
+
+    - name: Install podman
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/podman"
+        target: install

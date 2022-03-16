@@ -17,3 +17,5 @@ jobs:
       - run: containerd --version
       - run: skopeo --version
       - run: crun --version
+      - run: podman --version
+      - run: crio --version
