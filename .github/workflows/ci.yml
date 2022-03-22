@@ -19,3 +19,5 @@ jobs:
       - run: crun --version
       - run: podman --version
       - run: crio --version
+      - run: runsc --version
+      - run: podman info

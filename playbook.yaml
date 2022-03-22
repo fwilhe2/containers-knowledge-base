@@ -112,6 +112,15 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    - name: Install runtime dependencies for rootlesskit
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - uidmap
+      become: true
+      when: ansible_os_family == 'Debian'
+
     - name: Build runc
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
@@ -154,6 +163,7 @@
         mode: "777"
 
     - name: Install CNI plugins
+      become: true
       ansible.builtin.shell: cp bin/* /usr/local/libexec/cni
       args:
         chdir: "{{ home }}/code/fwilhe-containers/plugins"
@@ -184,7 +194,7 @@
       get_url:
         url: https://releases.bazel.build/5.0.0/release/bazel-5.0.0-linux-x86_64
         dest: /usr/local/bin/bazel
-        mode: '0777'
+        mode: "0777"
 
     - name: Build gvisor
       ansible.builtin.shell:
@@ -214,6 +224,16 @@
       become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/conmon"
+        target: install
+
+    - name: Build rootlesskit
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/rootlesskit"
+
+    - name: Install rootlesskit
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/rootlesskit"
         target: install
 
     - name: Build podman
