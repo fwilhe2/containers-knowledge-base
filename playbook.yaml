@@ -152,10 +152,22 @@
         chdir: "{{ home }}/code/fwilhe-containers/skopeo"
         target: install
 
-    # - name: Build gvisor
-    #   community.general.make:
-    #     chdir: ~/code/google/gvisor
-    #     target: runsc
+    - name: Download bazelisk to build gvisor
+      become: true
+      get_url:
+        url: https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
+        dest: /usr/local/bin/bazelisk
+        mode: '0777'
+
+    - name: Build gvisor
+      ansible.builtin.shell:
+        cmd: bazelisk build -c opt //debian:debian
+        args:
+          chdir: "{{ home }}/code/fwilhe-containers/gvisor"
+
+    - name: install the runsc binary
+      ansible.builtin.apt:
+        deb: "{{ home }}/code/fwilhe-containers/gvisor/bazel-bin/debian/debian.deb"
 
     - name: Build cri-o
       community.general.make:

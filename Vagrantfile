@@ -9,8 +9,8 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider "virtualbox" do |provider|
-    provider.memory = 1024
-    provider.cpus = 2
+    provider.memory = 4096
+    provider.cpus = 8
   end
 
   config.vm.provision "ansible_local" do |ansible|
