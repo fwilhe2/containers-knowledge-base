@@ -97,6 +97,21 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    - name: Install build dependencies for conmon
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - gcc
+        - git
+        - libc6-dev
+        - libglib2.0-dev
+        - libseccomp-dev
+        - pkg-config
+        - make
+      become: true
+      when: ansible_os_family == 'Debian'
+
     - name: Build runc
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
@@ -131,6 +146,18 @@
       args:
         chdir: "{{ home }}/code/fwilhe-containers/plugins"
 
+    - name: Create /usr/local/libexec/cni Directory
+      become: true
+      file:
+        path: /usr/local/libexec/cni
+        state: directory
+        mode: "777"
+
+    - name: Install CNI plugins
+      ansible.builtin.shell: cp bin/* /usr/local/libexec/cni
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/plugins"
+
     - name: Install containerd
       become: true
       community.general.make:
@@ -152,20 +179,20 @@
         chdir: "{{ home }}/code/fwilhe-containers/skopeo"
         target: install
 
-    - name: Download bazelisk to build gvisor
+    - name: Download bazel to build gvisor
       become: true
       get_url:
-        url: https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
-        dest: /usr/local/bin/bazelisk
+        url: https://releases.bazel.build/5.0.0/release/bazel-5.0.0-linux-x86_64
+        dest: /usr/local/bin/bazel
         mode: '0777'
 
     - name: Build gvisor
       ansible.builtin.shell:
-        cmd: bazelisk build -c opt //debian:debian
-        args:
-          chdir: "{{ home }}/code/fwilhe-containers/gvisor"
+        cmd: bazel build -c opt //debian:debian
+        chdir: "{{ home }}/code/fwilhe-containers/gvisor"
 
     - name: install the runsc binary
+      become: true
       ansible.builtin.apt:
         deb: "{{ home }}/code/fwilhe-containers/gvisor/bazel-bin/debian/debian.deb"
 
@@ -177,6 +204,16 @@
       become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/cri-o"
+        target: install
+
+    - name: Build conmon
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/conmon"
+
+    - name: Install conmon
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/conmon"
         target: install
 
     - name: Build podman
