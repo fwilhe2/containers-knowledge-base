@@ -8,10 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17'
       - name: Install dependencies
         run: sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install -yqq ansible git python3-apt build-essential
       - name: Run demo playbook
-        run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
+        run: ansible-playbook -vvv --inventory "localhost," --connection=local playbook.yaml
       - run: conmon --version
       - run: containerd --version
       - run: crio --version
