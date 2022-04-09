@@ -46,16 +46,3 @@ jobs:
       - name: Start VirtualBox VM
         run: |
           vagrant up || ( vagrant destroy --force && vagrant up )
-
-      - name: Add main user to VirtualBox VM
-        run: |
-          echo "test password" > vault-my_workstation.password
-          ansible --become --user vagrant --extra-vars "ansible_password=vagrant ansible_python_interpreter=/usr/bin/python3" -m user -a "name=${MYUSER} password={{ \"${PASSWORD}\" | password_hash('sha512') }} append=yes groups=wheel" -i "127.0.0.1," 127.0.0.1
-
-      - name: Setup VM
-        run: |
-          ansible-playbook -v --user="${MYUSER}" --extra-vars "ansible_password=${PASSWORD} ansible_become_password=${PASSWORD} ansible_python_interpreter=/usr/bin/python3" -i "127.0.0.1," --connection=local playbook.yaml
-
-      - name: Test
-        run: |
-          ansible-playbook -v --user="${MYUSER}" --extra-vars "ansible_password=${PASSWORD} ansible_become_password=${PASSWORD} ansible_python_interpreter=/usr/bin/python3" -i "127.0.0.1," --connection=local playbook.yaml
