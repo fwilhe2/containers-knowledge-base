@@ -17,19 +17,19 @@ jobs:
     container: ubuntu:21.10
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential
-      - name: Run demo playbook
-        run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
-      - run: conmon --version
-      - run: containerd --version
-      - run: crio --version
-      - run: crun --version
-      - run: podman --version
-      - run: rootlesskit --version
-      - run: runc --version
-      - run: runsc --version
-      - run: skopeo --version
+#       - name: Install dependencies
+#         run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential
+#       - name: Run demo playbook
+#         run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
+#       - run: conmon --version
+#       - run: containerd --version
+#       - run: crio --version
+#       - run: crun --version
+#       - run: podman --version
+#       - run: rootlesskit --version
+#       - run: runc --version
+#       - run: runsc --version
+#       - run: skopeo --version
       
   # based on https://github.com/ruzickap/ansible-my_workstation/blob/main/.github/workflows/fedora.yml
   virtualbox:
@@ -45,7 +45,6 @@ jobs:
 
       - name: Start VirtualBox VM
         run: |
-          vagrant init generic/ubuntu2110
           vagrant up || ( vagrant destroy --force && vagrant up )
 
       - name: Add main user to VirtualBox VM
