@@ -3,6 +3,14 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  MYUSER: florian
+  PASSWORD: xxxx
+  ANSIBLE_HOST_KEY_CHECKING: False
+  ANSIBLE_REMOTE_PORT: 2222
+  RAM: 4096
+  VAGRANT_DEFAULT_PROVIDER: virtualbox
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,3 +30,29 @@ jobs:
       - run: runc --version
       - run: runsc --version
       - run: skopeo --version
+      
+  # based on https://github.com/ruzickap/ansible-my_workstation/blob/main/.github/workflows/fedora.yml
+  virtualbox:
+    runs-on: macos-10.15
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install brew packages
+        run: |
+          rm /usr/local/bin/2to3
+          brew install ansible gnu-sed hudochenkov/sshpass/sshpass vagrant
+
+      - name: Start VirtualBox VM
+        run: |
+          vagrant init generic/ubuntu2110
+          vagrant up || ( vagrant destroy --force && vagrant up )
+
+      - name: Add main user to VirtualBox VM
+        run: |
+          echo "test password" > vault-my_workstation.password
+          ansible --become --user vagrant --extra-vars "ansible_password=vagrant ansible_python_interpreter=/usr/bin/python3" -m user -a "name=${MYUSER} password={{ \"${PASSWORD}\" | password_hash('sha512') }} append=yes groups=wheel" -i "127.0.0.1," 127.0.0.1
+
+      - name: Ansible
+        run: |
+          ansible-playbook -v --user="${MYUSER}" --extra-vars "ansible_password=${PASSWORD} ansible_become_password=${PASSWORD} ansible_python_interpreter=/usr/bin/python3" -i "127.0.0.1," --connection=local playbook.yaml
