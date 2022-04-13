@@ -1,0 +1,32 @@
+# based on https://github.com/ruzickap/ansible-my_workstation/blob/main/.github/workflows/fedora.yml
+
+name: CI in Virtualbox (slow)
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  MYUSER: florian
+  PASSWORD: xxxx
+  ANSIBLE_HOST_KEY_CHECKING: False
+  ANSIBLE_REMOTE_PORT: 2222
+  RAM: 4096
+  VAGRANT_DEFAULT_PROVIDER: virtualbox
+
+jobs:
+  virtualbox:
+    runs-on: macos-10.15
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install brew packages
+        run: |
+          rm /usr/local/bin/2to3
+          brew install ansible gnu-sed hudochenkov/sshpass/sshpass vagrant
+
+      - name: Start VirtualBox VM
+        run: |
+          vagrant up || ( vagrant destroy --force && vagrant up )

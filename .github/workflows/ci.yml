@@ -1,15 +1,7 @@
-name: CI
+name: CI in Docker (fast, no full system-access)
 on:
   push:
   workflow_dispatch:
-
-env:
-  MYUSER: florian
-  PASSWORD: xxxx
-  ANSIBLE_HOST_KEY_CHECKING: False
-  ANSIBLE_REMOTE_PORT: 2222
-  RAM: 4096
-  VAGRANT_DEFAULT_PROVIDER: virtualbox
 
 jobs:
   build:
@@ -17,32 +9,16 @@ jobs:
     container: ubuntu:21.10
     steps:
       - uses: actions/checkout@v2
-#       - name: Install dependencies
-#         run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential
-#       - name: Run demo playbook
-#         run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
-#       - run: conmon --version
-#       - run: containerd --version
-#       - run: crio --version
-#       - run: crun --version
-#       - run: podman --version
-#       - run: rootlesskit --version
-#       - run: runc --version
-#       - run: runsc --version
-#       - run: skopeo --version
-
-  # based on https://github.com/ruzickap/ansible-my_workstation/blob/main/.github/workflows/fedora.yml
-  virtualbox:
-    runs-on: macos-10.15
-    timeout-minutes: 100
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install brew packages
-        run: |
-          rm /usr/local/bin/2to3
-          brew install ansible gnu-sed hudochenkov/sshpass/sshpass vagrant
-
-      - name: Start VirtualBox VM
-        run: |
-          vagrant up || ( vagrant destroy --force && vagrant up )
+      - name: Install dependencies
+        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential
+      - name: Run demo playbook
+        run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
+      - run: conmon --version
+      - run: containerd --version
+      - run: crio --version
+      - run: crun --version
+      - run: podman --version
+      - run: rootlesskit --version
+      - run: runc --version
+      - run: runsc --version
+      - run: skopeo --version
