@@ -26,4 +26,6 @@ Vagrant.configure(2) do |config|
     shell.inline = 'echo rebooting after provisioning'
     shell.reboot = true
   end
+
+  config.vm.provision "shell", path: "run-tools.sh"
 end

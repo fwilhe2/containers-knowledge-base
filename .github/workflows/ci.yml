@@ -1,4 +1,4 @@
-name: CI
+name: CI in Docker (fast, no full system-access)
 on:
   push:
   workflow_dispatch:
