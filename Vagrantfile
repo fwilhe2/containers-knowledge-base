@@ -27,11 +27,5 @@ Vagrant.configure(2) do |config|
     shell.reboot = true
   end
 
-  config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "test.yaml"
-    ansible.compatibility_mode = "2.0"
-    ansible.raw_arguments = [
-        '-vvvv'
-    ]
-  end
+  config.vm.provision "shell", path: "run-tools.sh"
 end
