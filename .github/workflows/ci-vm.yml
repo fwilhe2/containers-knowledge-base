@@ -8,11 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  MYUSER: florian
-  PASSWORD: xxxx
-  ANSIBLE_HOST_KEY_CHECKING: False
-  ANSIBLE_REMOTE_PORT: 2222
-  RAM: 4096
   VAGRANT_DEFAULT_PROVIDER: virtualbox
 
 jobs:
