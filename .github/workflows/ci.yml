@@ -3,6 +3,9 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  ANSIBLE_STDOUT_CALLBACK: yaml
+
 jobs:
   build:
     runs-on: ubuntu-latest
