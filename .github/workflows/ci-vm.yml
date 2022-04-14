@@ -32,7 +32,7 @@ jobs:
 
       - name: Package VM
         run: |
-          vagrant package --machine-readable --output containers-lab.box --info box-info.json
+          vagrant package --machine-readable --output containers-lab.box --info info.json
 
       - run: ls -la
 
