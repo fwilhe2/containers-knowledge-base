@@ -251,7 +251,7 @@
     - name: configue slirp4netns
       ansible.builtin.shell: ./autogen.sh && ./configure --prefix=/usr
       args:
-        chdir: "{{ home }}/code/fwilhe-containers/crun"
+        chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
 
     - name: Build slirp4netns for rootless networking in podman
       community.general.make:
