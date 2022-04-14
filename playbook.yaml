@@ -236,6 +236,33 @@
         chdir: "{{ home }}/code/fwilhe-containers/rootlesskit"
         target: install
 
+    - name: Install build dependencies for slirp4netns
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - libglib2.0-dev
+        - libslirp-dev
+        - libcap-dev
+        - libseccomp-dev
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: configue slirp4netns
+      ansible.builtin.shell: ./autogen.sh && ./configure --prefix=/usr
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
+
+    - name: Build slirp4netns for rootless networking in podman
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
+
+    - name: Install slirp4netns
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
+        target: install
+
     - name: Build podman
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"

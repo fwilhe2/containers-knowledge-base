@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ubuntu:21.10
+    container: ubuntu:jammy-20220404
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
