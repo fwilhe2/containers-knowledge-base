@@ -31,6 +31,12 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    - name: Create systemd/build Directory
+      file:
+        path: "{{ home }}/code/fwilhe-containers/systemd/build"
+        state: directory
+        mode: "750"
+
     - name: Build systemd
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/systemd"
