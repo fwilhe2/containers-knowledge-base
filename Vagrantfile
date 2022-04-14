@@ -28,4 +28,6 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", path: "run-tools.sh"
+
+  config.vm.provision "file", source: "~/box-readme.md", destination: "readme.md"
 end

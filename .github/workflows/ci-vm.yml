@@ -32,6 +32,11 @@ jobs:
 
       - name: Package VM
         run: |
-          vagrant package --machine-readable --output containers-lab.box
+          vagrant package --machine-readable --output containers-lab.box --info box-info.json
 
       - run: ls -la
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: vagrant-box
+          path: containers-lab.box
