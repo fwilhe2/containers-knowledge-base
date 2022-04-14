@@ -37,6 +37,12 @@
         state: directory
         mode: "750"
 
+    - name: Create systemd/build Directory
+      file:
+        path: "{{ home }}/code/fwilhe-containers/systemd/destdir"
+        state: directory
+        mode: "750"
+
     - name: configue systemd
       ansible.builtin.shell: meson build
       args:
@@ -51,6 +57,11 @@
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/systemd"
         target: install
+        params:
+          DESTDIR: "{{ home }}/code/fwilhe-containers/systemd/destdir"
+
+    - name: debug
+      ansible.builtin.shell: find "{{ home }}/code/fwilhe-containers/systemd/destdir"
 
     - name: Install build dependencies for runc
       apt:
