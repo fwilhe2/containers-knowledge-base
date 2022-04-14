@@ -50,6 +50,7 @@
         - build-essential
         - pkgconf
         - libtool
+        - libsystemd-dev
         - libprotobuf-c-dev
         - libcap-dev
         - libseccomp-dev
@@ -78,6 +79,7 @@
         name: "{{ item }}"
       loop:
         - pkg-config
+        - libsystemd-dev
         - libdbus-glib-1-dev
         - build-essential
         - libelf-dev
