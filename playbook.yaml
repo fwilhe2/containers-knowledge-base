@@ -19,6 +19,11 @@
       tags: containers
       loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
 
+    - name: Add source repository into sources list
+      ansible.builtin.apt_repository:
+        repo: deb-src https://mirrors.kernel.org/ubuntu/ impish main restricted
+        state: present
+
     - name: Install systemd build dependencies
       apt:
         state: build-dep
