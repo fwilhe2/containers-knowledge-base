@@ -50,7 +50,6 @@
         - build-essential
         - pkgconf
         - libtool
-        - libsystemd-dev
         - libprotobuf-c-dev
         - libcap-dev
         - libseccomp-dev
