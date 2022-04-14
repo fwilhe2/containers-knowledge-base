@@ -22,6 +22,16 @@ jobs:
           rm /usr/local/bin/2to3
           brew install ansible gnu-sed hudochenkov/sshpass/sshpass vagrant
 
-      - name: Start VirtualBox VM
+      - name: Start VM, run demo playbook
         run: |
           vagrant up || ( vagrant destroy --force && vagrant up )
+
+      - name: Stop VM
+        run: |
+          vagrant halt
+
+      - name: Package VM
+        run: |
+          vagrant package --machine-readable --output containers-lab.box
+
+      - run: ls -la
