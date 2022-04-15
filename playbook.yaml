@@ -19,14 +19,47 @@
       tags: containers
       loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
 
-    - name: Install systemd-container
-      apt:
+    - name: Add source repository into sources list
+      ansible.builtin.apt_repository:
+        repo: deb-src https://mirrors.kernel.org/ubuntu/ impish main restricted
         state: present
-        name: "{{ item }}"
-      loop:
-        - systemd-container
+      become: true
+
+    - name: Install systemd build dependencies
+      apt:
+        state: build-dep
+        name: systemd
       become: true
       when: ansible_os_family == 'Debian'
+
+    - name: Create systemd/build Directory
+      file:
+        path: "{{ home }}/code/fwilhe-containers/systemd/build"
+        state: directory
+        mode: "750"
+
+    - name: Create systemd/build Directory
+      file:
+        path: "{{ home }}/code/fwilhe-containers/systemd/destdir"
+        state: directory
+        mode: "750"
+
+    - name: configue systemd
+      ansible.builtin.shell: meson build
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/systemd"
+
+    - name: Build systemd
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/systemd"
+
+    - name: Install systemd
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/systemd"
+        target: install
+        params:
+          DESTDIR: "{{ home }}/code/fwilhe-containers/systemd/destdir"
 
     - name: Install build dependencies for runc
       apt:
