@@ -1,4 +1,5 @@
 echo "::group::Version Info"
+bwrap --version
 conmon --version
 containerd --version
 crio --version

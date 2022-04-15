@@ -146,6 +146,21 @@
         chdir: "{{ home }}/code/fwilhe-containers/crun"
         target: install
 
+    - name: configue bubblewrap
+      ansible.builtin.shell: ./autogen.sh
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+
+    - name: Build bubblewrap
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+
+    - name: Install bubblewrap
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+        target: install
+
     - name: Build containerd
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/containerd"
