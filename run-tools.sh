@@ -20,13 +20,10 @@ echo "::group::Podman Hello"
 podman run quay.io/podman/hello
 echo "::endgroup::"
 
+echo "::group::Test lifecycle of a container with crun"
 pushd ~/code/fwilhe-containers/container-image
 nc -lkU mySocket.sock &
-crun create --console-socket=mySocket.sock myContainer
-crun list --format=json
-crun --debug state myContainer
-crun start myContainer
-crun list --format=json
-crun --debug state myContainer
-
+sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-pip
+pytest -svv
 popd
+echo "::endgroup::"

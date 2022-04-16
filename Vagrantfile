@@ -27,5 +27,7 @@ Vagrant.configure(2) do |config|
     shell.reboot = true
   end
 
+  config.vm.provision "file", source: "test_crun.py", destination: "~/code/fwilhe-containers/container-image/test_crun.py"
+
   config.vm.provision "shell", path: "run-tools.sh", privileged: false
 end
