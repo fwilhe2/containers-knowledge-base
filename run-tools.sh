@@ -23,5 +23,7 @@ echo "::endgroup::"
 pushd ~/code/fwilhe-containers/container-image
 nc -lkU mySocket.sock &
 crun create --console-socket=mySocket.sock myContainer
-crun list
+crun list --format=json
+crun start
+crun list --format=json
 popd
