@@ -33,10 +33,10 @@ def test_crun_container_lifecycle():
     stdout, stderr = crun(['list', '--format=json'])
     parsed_stdout = json.loads(stdout)
     assert parsed_stdout[0]['id'] == 'myContainer'
-    assert parsed_stdout[0]['status'] == 'stopped' or parsed_stdout[0]['status'] == 'running'
+    assert parsed_stdout[0]['status'] == 'running'
     assert stderr == ""
 
-    stdout, stderr = crun(['delete', 'myContainer'])
+    stdout, stderr = crun(['delete', '--force', 'myContainer'])
     assert stdout == ""
     assert stderr == ""
 
