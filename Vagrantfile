@@ -27,5 +27,5 @@ Vagrant.configure(2) do |config|
     shell.reboot = true
   end
 
-  config.vm.provision "shell", path: "run-tools.sh"
+  config.vm.provision "shell", path: "run-tools.sh", privileged: false
 end

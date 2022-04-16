@@ -24,6 +24,9 @@ pushd ~/code/fwilhe-containers/container-image
 nc -lkU mySocket.sock &
 crun create --console-socket=mySocket.sock myContainer
 crun list --format=json
-crun start
+crun --debug state myContainer
+crun start myContainer
 crun list --format=json
+crun --debug state myContainer
+
 popd
