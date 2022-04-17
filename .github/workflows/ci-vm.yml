@@ -26,6 +26,15 @@ jobs:
         run: |
           brew install ansible vagrant
 
-      - name: Start VirtualBox VM
+      - name: Start VM to build tools from source
         run: |
           vagrant up || ( vagrant destroy --force && vagrant up )
+
+      - name: Check version of built tools
+        run: vagrant ssh --command "bash versions.sh"
+
+      - name: Check basic podman functionality
+        run: vagrant ssh --command "bash podman.sh"
+
+      - name: Check basic skopeo functionality
+        run: vagrant ssh --command "bash skopeo.sh"
