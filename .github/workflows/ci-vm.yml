@@ -38,3 +38,13 @@ jobs:
 
       - name: Check basic skopeo functionality
         run: vagrant ssh --command "bash skopeo.sh"
+
+      - name: Package VM
+        run: |
+          vagrant package --debug --no-tty --output containers-lab.box --info info.json
+      - run: ls -la
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: containers-lab-vagrant-box
+          path: containers-lab.box

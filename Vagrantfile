@@ -28,6 +28,8 @@ Vagrant.configure(2) do |config|
   config.vm.provision "file", source: "test-scripts/podman.sh", destination: "~/podman.sh"
   config.vm.provision "file", source: "test-scripts/skopeo.sh", destination: "~/skopeo.sh"
 
+  config.vm.provision "file", source: "box-readme.md", destination: "readme.md"
+
   config.vm.provision :shell do |shell|
     shell.privileged = true
     shell.inline = 'echo rebooting after provisioning'
