@@ -27,6 +27,12 @@ Vagrant.configure(2) do |config|
   config.vm.provision "file", source: "test-scripts/versions.sh", destination: "~/versions.sh"
   config.vm.provision "file", source: "test-scripts/podman.sh", destination: "~/podman.sh"
   config.vm.provision "file", source: "test-scripts/skopeo.sh", destination: "~/skopeo.sh"
+  config.vm.provision "file", source: "test-scripts/test_crun.py", destination: "~/code/fwilhe-containers/container-image/test_crun.py"
+  config.vm.provision "file", source: "container-socket.service", destination: "~/container-socket.service"
+  config.vm.provision "shell", inline: "cp container-socket.service /etc/systemd/system/container-socket.service && sudo systemctl enable container-socket.service"
+
+  # Pytest for running tests
+  config.vm.provision "shell", inline: "DEBIAN_FRONTEND=noninteractive apt-get -yqq install python3-pip && pip --no-input install pytest"
 
   config.vm.provision "file", source: "box-readme.md", destination: "readme.md"
 
