@@ -39,6 +39,11 @@ jobs:
       - name: Check basic skopeo functionality
         run: vagrant ssh --command "bash skopeo.sh"
 
+      - name: Test crun
+        run: |
+          vagrant ssh --command "nc -lkU ~/code/fwilhe-containers/container-image/mySocket.sock &"
+          vagrant ssh --command "cd ~/code/fwilhe-containers/container-image/ && pytest"
+
       - name: Package VM
         run: |
           vagrant package --debug --no-tty --output containers-lab.box --info info.json
