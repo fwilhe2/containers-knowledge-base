@@ -1,0 +1,14 @@
+[Unit]
+Description=Container Socket Service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=vagrant
+ExecStart=nc -lkU /home/vagrant/code/fwilhe-containers/container-image/mySocket.sock
+
+[Install]
+WantedBy=multi-user.target
