@@ -95,6 +95,10 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    - name: Build container-image
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/container-image"
+
     - name: Install build dependencies for skopeo
       apt:
         state: present
