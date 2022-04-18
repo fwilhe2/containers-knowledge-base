@@ -59,7 +59,7 @@
         chdir: "{{ home }}/code/fwilhe-containers/systemd"
         target: install
         params:
-          DESTDIR: "{{ home }}/code/fwilhe-containers/systemd/destdir"
+          DESTDIR: "/"
 
     - name: Install build dependencies for runc
       apt:

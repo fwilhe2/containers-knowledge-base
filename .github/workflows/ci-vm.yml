@@ -25,3 +25,9 @@ jobs:
       - name: Start VirtualBox VM
         run: |
           vagrant up || ( vagrant destroy --force && vagrant up )
+
+      - name: Check systemd version
+        run: vagrant ssh --command "systemctl --version"
+
+      - name: Check systemd status
+        run: vagrant ssh --command "systemctl status"
