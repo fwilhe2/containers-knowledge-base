@@ -5,7 +5,7 @@ import json
 def crun(args):
     command = ["crun"] + args
     print(command)
-    output = subprocess.run(command, capture_output=True)
+    output = subprocess.run(command, capture_output=True, cwd='~/code/fwilhe-containers/container-image')
     stdout = output.stdout.decode("utf-8").rstrip()
     stderr = output.stderr.decode("utf-8").rstrip()
     return (stdout, stderr)

@@ -27,13 +27,13 @@ jobs:
           vagrant up || ( vagrant destroy --force && vagrant up )
 
       - name: Check version of built tools
-        run: vagrant ssh --command "bash versions.sh"
+        run: vagrant ssh --command "bash test-scripts/versions.sh"
 
       - name: Check basic podman functionality
-        run: vagrant ssh --command "bash podman.sh"
+        run: vagrant ssh --command "bash test-scripts/podman.sh"
 
       - name: Check basic skopeo functionality
-        run: vagrant ssh --command "bash skopeo.sh"
+        run: vagrant ssh --command "bash test-scripts/skopeo.sh"
 
       - name: Test crun
         run: |
@@ -43,7 +43,6 @@ jobs:
         run: |
           vagrant package --debug --no-tty --output containers-lab.box --info info.json
       - run: ls -la
-
 #       - uses: actions/upload-artifact@v3
 #         with:
 #           name: containers-lab-vagrant-box
