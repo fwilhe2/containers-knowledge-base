@@ -22,10 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install brew packages
-        run: |
-          brew install ansible vagrant
-
       - name: Start VM to build tools from source
         run: |
           vagrant up || ( vagrant destroy --force && vagrant up )
