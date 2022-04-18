@@ -41,9 +41,9 @@ jobs:
       - name: Check basic skopeo functionality
         run: vagrant ssh --command "bash test-scripts/skopeo.sh"
 
-      - name: Test crun
+      - name: Run pytest tests
         run: |
-          vagrant ssh --command "cd ~/code/fwilhe-containers/container-image/ && pytest"
+          vagrant ssh --command "cd ~/test-scripts/ && pytest -sv"
 
       - name: Package VM
         run: |
