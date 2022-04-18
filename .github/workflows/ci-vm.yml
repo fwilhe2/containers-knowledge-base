@@ -6,10 +6,11 @@ on:
     branches:
       - main
     paths:
-      - Vagrantfile
-      - .github/workflows/ci-vm.yml
-      - .playbook.yaml
-      - git-repos.txt
+      - 'Vagrantfile'
+      - '.github/workflows/ci-vm.yml'
+      - '.playbook.yaml'
+      - 'git-repos.txt'
+      - 'vm-resources/**'
   workflow_dispatch:
 
 env:
