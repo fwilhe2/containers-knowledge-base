@@ -44,7 +44,7 @@ jobs:
           vagrant package --debug --no-tty --output containers-lab.box --info info.json
       - run: ls -la
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: containers-lab-vagrant-box
-          path: containers-lab.box
+#       - uses: actions/upload-artifact@v3
+#         with:
+#           name: containers-lab-vagrant-box
+#           path: containers-lab.box
