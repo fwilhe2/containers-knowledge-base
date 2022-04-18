@@ -26,6 +26,12 @@ jobs:
         run: |
           vagrant up || ( vagrant destroy --force && vagrant up )
 
+      - name: Check systemd version
+        run: vagrant ssh --command "systemctl --version"
+
+      - name: Check systemd status
+        run: vagrant ssh --command "systemctl status"
+
       - name: Check version of built tools
         run: vagrant ssh --command "bash test-scripts/versions.sh"
 
