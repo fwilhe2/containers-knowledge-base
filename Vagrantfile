@@ -1,5 +1,5 @@
 Vagrant.configure(2) do |config|
-  config.vm.box = "generic/ubuntu2110"
+  config.vm.box = "fwilhe/ubuntu-2204"
 
   config.vm.synced_folder ".", "/vagrant", disabled: false
 
