@@ -21,7 +21,7 @@
 
     - name: Add source repository into sources list
       ansible.builtin.apt_repository:
-        repo: deb-src https://mirrors.kernel.org/ubuntu/ impish main restricted
+        repo: deb-src https://mirrors.kernel.org/ubuntu/ jammy main restricted
         state: present
       become: true
 
@@ -166,6 +166,17 @@
       become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
+        target: install
+
+    - name: Build footloose
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/footloose"
+        target: footloose
+
+    - name: Install footloose
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/footloose"
         target: install
 
     - name: configue crun
