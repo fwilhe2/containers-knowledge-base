@@ -171,6 +171,7 @@
     - name: Build footloose
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/footloose"
+        target: footloose
 
     - name: Install footloose
       become: true
