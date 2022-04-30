@@ -168,6 +168,16 @@
         chdir: "{{ home }}/code/fwilhe-containers/runc"
         target: install
 
+    - name: Build footloose
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/footloose"
+
+    - name: Install footloose
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/footloose"
+        target: install
+
     - name: configue crun
       ansible.builtin.shell: ./autogen.sh && ./configure
       args:
