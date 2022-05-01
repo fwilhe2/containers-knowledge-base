@@ -54,7 +54,7 @@ jobs:
       - name: Package VM
         run: |
           vagrant package --debug --no-tty --output containers-lab.box --info info.json
-      - run: ls -la; sha256sum containers-lab.box
+      - run: ls -la
 
       - uses: actions/upload-artifact@v3
         if: github.event.inputs.uploadVmImage
