@@ -22,6 +22,7 @@ jobs:
       - run: containerd --version
       - run: crio --version
       - run: crun --version
+      - run: ignite version
       - run: podman --version
       - run: rootlesskit --version
       - run: runc --version

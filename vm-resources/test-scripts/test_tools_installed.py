@@ -4,7 +4,7 @@ import json
 
 def run_command(command):
     print(command)
-    output = subprocess.run(command, capture_output=True)
+    output = subprocess.run(command, capture_output=True, check=True)
     stdout = output.stdout.decode("utf-8").rstrip()
     stderr = output.stderr.decode("utf-8").rstrip()
     return (stdout, stderr)
@@ -15,6 +15,7 @@ def run_command(command):
     ('containerd --version', 0),
     ('crio --version', 0),
     ('crun --version', 0),
+    ('ignite version', 0),
     ('podman --version', 0),
     ('podman info', 0),
     ('rootlesskit --version', 0),
