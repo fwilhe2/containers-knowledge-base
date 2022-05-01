@@ -206,7 +206,6 @@
           GO_MAKE_TARGET: local
 
     - name: Install ignite
-      become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/ignite"
         target: install
