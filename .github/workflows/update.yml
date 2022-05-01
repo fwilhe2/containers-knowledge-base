@@ -1,0 +1,14 @@
+name: Update forked repos
+on:
+  workflow_dispatch:
+  schedule:
+    # At 07:00 UTC on Sunday
+    - cron: '0 7 * * 0'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: python3 update-forks.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
