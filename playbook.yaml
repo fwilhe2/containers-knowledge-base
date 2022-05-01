@@ -198,6 +198,20 @@
         chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
         target: install
 
+    - name: Build ignite
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/ignite"
+        target: ignite
+        params:
+          GO_MAKE_TARGET: local
+
+    - name: Install ignite
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/ignite"
+        target: install
+        params:
+          GO_MAKE_TARGET: local
+
     - name: Build containerd
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/containerd"
