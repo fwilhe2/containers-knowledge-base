@@ -329,6 +329,17 @@
         chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
         target: install
 
+    - name: Build ctop
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/ctop"
+        target: build
+
+    - name: Build ctop
+      become: true
+      ansible.builtin.shell:
+        cmd: cp ctop /usr/local/bin
+        chdir: "{{ home }}/code/fwilhe-containers/ctop"
+
     - name: Build podman
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
