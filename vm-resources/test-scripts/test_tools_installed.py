@@ -15,6 +15,7 @@ def run_command(command):
     ('containerd --version', 0),
     ('crio --version', 0),
     ('crun --version', 0),
+    ('ctop -v', 0),
     ('ignite version', 0),
     ('podman --version', 0),
     ('podman info', 0),
