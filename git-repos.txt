@@ -8,6 +8,7 @@ https://github.com/fwilhe-containers/crun
 https://github.com/fwilhe-containers/ctop
 https://github.com/fwilhe-containers/gvisor
 https://github.com/fwilhe-containers/ignite
+https://github.com/fwilhe-containers/nodejs-container-image-builder
 https://github.com/fwilhe-containers/plugins
 https://github.com/fwilhe-containers/podman
 https://github.com/fwilhe-containers/rootlesskit
