@@ -1,0 +1,1 @@
+vagrant package --debug --no-tty --output containers-lab-$(date +%Y-%m-%d-%H-%M).box --info info.json
