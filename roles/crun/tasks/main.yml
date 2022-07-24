@@ -1,0 +1,38 @@
+---
+- name: Install build dependencies for crun
+  apt:
+    state: present
+    name: "{{ item }}"
+  loop:
+    - make
+    - git
+    - gcc
+    - build-essential
+    - pkgconf
+    - libtool
+    - libsystemd-dev
+    - libprotobuf-c-dev
+    - libcap-dev
+    - libseccomp-dev
+    - libyajl-dev
+    - go-md2man
+    - autoconf
+    - python3
+    - automake
+  become: true
+  when: ansible_os_family == 'Debian'
+
+- name: configue crun
+  ansible.builtin.shell: ./autogen.sh && ./configure
+  args:
+    chdir: "{{ home }}/code/fwilhe-containers/crun"
+
+- name: Build crun
+  community.general.make:
+    chdir: "{{ home }}/code/fwilhe-containers/crun"
+
+- name: Install crun
+  become: true
+  community.general.make:
+    chdir: "{{ home }}/code/fwilhe-containers/crun"
+    target: install

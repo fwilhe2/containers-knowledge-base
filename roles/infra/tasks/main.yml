@@ -1,0 +1,14 @@
+---
+- name: Create ~/code Directory
+  file:
+    path: "{{ home }}/code"
+    state: directory
+    mode: "750"
+
+- name: Clone container-related git repos
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: '{{ home }}/code/{{ item | urlsplit("path") }}'
+    depth: 1
+  tags: containers
+  loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
