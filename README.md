@@ -17,7 +17,8 @@ Collection of knowledge on containers 🐋📦
 
 ### [cgroups](https://en.wikipedia.org/wiki/Cgroups)
 
-[Introduction to cgroups](https://0xax.gitbooks.io/linux-insides/content/Cgroups/linux-cgroups-1.html)
+- [Introduction to cgroups](https://0xax.gitbooks.io/linux-insides/content/Cgroups/linux-cgroups-1.html)
+- [Cgroups - Deep Dive into Resource Management in Kubernetes](https://martinheinz.dev/blog/91)
 
 Copy-on-write filesystems
 
