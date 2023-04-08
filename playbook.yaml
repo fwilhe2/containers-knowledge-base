@@ -255,6 +255,13 @@
         chdir: "{{ home }}/code/fwilhe-containers/skopeo"
         target: install
 
+    - name: Install build dependencies for gvisor
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - clang
+
     - name: Download bazel to build gvisor
       become: true
       get_url:
