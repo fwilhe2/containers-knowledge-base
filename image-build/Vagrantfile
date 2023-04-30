@@ -1,0 +1,18 @@
+$script = <<-SCRIPT
+sudo dnf -y upgrade
+
+sudo dnf -y install git htop curl
+curl https://releases.bazel.build/6.1.1/release/bazel-6.1.1-linux-x86_64 --output bazel
+sudo mv bazel /usr/bin/bazel
+chmod +x /usr/bin/bazel
+
+SCRIPT
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "fedora/38-cloud-base"
+    config.vm.provider 'libvirt' do |provider|
+        provider.memory = 2048
+        provider.cpus = 4
+    end
+    config.vm.provision "shell", inline: $script
+end
