@@ -262,6 +262,7 @@
       loop:
         - clang
         - gcc-aarch64-linux-gnu
+        - g++
 
     - name: Download bazel to build gvisor
       become: true
