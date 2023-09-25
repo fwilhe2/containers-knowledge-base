@@ -261,6 +261,7 @@
         name: "{{ item }}"
       loop:
         - clang
+        - gcc-aarch64-linux-gnu
 
     - name: Download bazel to build gvisor
       become: true
