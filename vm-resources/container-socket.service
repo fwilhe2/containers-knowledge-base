@@ -7,8 +7,8 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-User=vagrant
-ExecStart=nc -lkU /home/vagrant/code/fwilhe-containers/container-image/mySocket.sock
+User=florian
+ExecStart=nc -lkU /tmp/mySocket.sock
 
 [Install]
 WantedBy=multi-user.target

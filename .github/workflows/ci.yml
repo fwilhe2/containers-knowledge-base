@@ -2,9 +2,9 @@ name: CI in Docker (fast, no full system-access)
 on:
   push:
     paths-ignore:
-      - '**.md'
-      - '.github/workflows/ci-vm.yml'
-      - 'vm-resources/**'
+      - "**.md"
+      - ".github/workflows/ci-vm.yml"
+      - "vm-resources/**"
   workflow_dispatch:
 
 jobs:
