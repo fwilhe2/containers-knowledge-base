@@ -51,9 +51,26 @@ Layering, Builder Pattern, Multi-Arch builds
 
 ## Playground Environment
 
-[`Vagrantfile`](./Vagrantfile) provides a reproducible development environment built via [an Ansible playbook](./playbook.yaml).
+[`container-lab.yaml`](./container-lab.yaml) provides a reproducible development environment built via [an Ansible playbook](./playbook.yaml).
 
 So far there is not much to see there, but the vision is to produce an environment with all needs to tinker with container software, to change it and to learn about it.
+
+It's built using [lima](https://github.com/lima-vm/lima/).
+The `Makefile` has some shortcuts for using it.
+
+This can be used with the [ssh remote plugin for vs code](https://code.visualstudio.com/docs/remote/ssh) to work with the repos inside the vm.
+
+Configuration for vs code ssh remote plugin:
+
+You need a local ssh key for this.
+
+Run the following command to allow easy access:
+
+```
+echo "Include ${LIMA_HOME:-$HOME/.lima}/container-lab-vm/ssh.config" >> ~/.ssh/config
+```
+
+After this you can connect to the host `lima-container-lab-vm`.
 
 ## Talks
 

@@ -21,7 +21,6 @@ def run_command(command):
     ('podman info', 0),
     ('rootlesskit --version', 0),
     ('runc --version', 0),
-    ('runsc --version', 0),
     ('skopeo --version', 0),
 ])
 def test_crun_container_lifecycle(command, expected):

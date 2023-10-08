@@ -6,7 +6,7 @@ from os.path import abspath, expanduser
 def crun(args):
     command = ["crun"] + args
     print(command)
-    output = subprocess.run(command, capture_output=True, cwd=abspath(expanduser('~/code/fwilhe-containers/container-image')))
+    output = subprocess.run(command, capture_output=True, cwd=abspath(expanduser('~/code/container-image')))
     stdout = output.stdout.decode("utf-8").rstrip()
     stderr = output.stderr.decode("utf-8").rstrip()
     return (stdout, stderr)
@@ -17,7 +17,7 @@ def test_crun_container_lifecycle():
     assert len(parsed_stdout) == 0
     assert stderr == ""
 
-    stdout, stderr = crun(['create', '--console-socket=mySocket.sock', 'myContainer'])
+    stdout, stderr = crun(['create', '--console-socket=/tmp/mySocket.sock', 'myContainer'])
     assert stdout == ""
     assert stderr == ""
 
