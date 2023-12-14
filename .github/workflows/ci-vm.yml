@@ -56,7 +56,7 @@ jobs:
           vagrant package --debug --no-tty --output containers-lab.box --info info.json
       - run: ls -la
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: github.event.inputs.uploadVmImage
         with:
           name: containers-lab-vagrant-box
