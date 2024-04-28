@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ubuntu:lunar
+    container: ubuntu:noble
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
