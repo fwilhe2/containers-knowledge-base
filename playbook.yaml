@@ -147,20 +147,23 @@
         chdir: "{{ home }}/code/fwilhe-containers/crun"
         target: install
 
+    - name: Install build dependencies for bubblewrap
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - meson
+      become: true
+      when: ansible_os_family == 'Debian'
+
     - name: configue bubblewrap
-      ansible.builtin.shell: ./autogen.sh
+      ansible.builtin.shell: |
+        meson _builddir
+        meson compile -C _builddir
+        meson test -C _builddir
+        meson install -C _builddir
       args:
         chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
-
-    - name: Build bubblewrap
-      community.general.make:
-        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
-
-    - name: Install bubblewrap
-      become: true
-      community.general.make:
-        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
-        target: install
 
     - name: Build ignite
       community.general.make:
