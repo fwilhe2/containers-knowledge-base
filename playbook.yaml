@@ -238,7 +238,7 @@
 
     - name: Build gvisor
       ansible.builtin.shell:
-        cmd: bazel build -c opt //debian:debian
+        cmd: bazel build --enable_workspace -c opt //debian:debian
         chdir: "{{ home }}/code/fwilhe-containers/gvisor"
 
     - name: install the runsc binary
