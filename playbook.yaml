@@ -232,7 +232,7 @@
     - name: Download bazel to build gvisor
       become: true
       get_url:
-        url: https://releases.bazel.build/6.1.1/release/bazel-6.1.1-linux-x86_64
+        url: https://releases.bazel.build/8.0.0/release/bazel-8.0.0-linux-x86_64
         dest: /usr/local/bin/bazel
         mode: "0777"
 
