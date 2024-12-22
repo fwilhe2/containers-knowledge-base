@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: 'ubuntu:24.04'
+    container: 'ubuntu:24.10'
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
