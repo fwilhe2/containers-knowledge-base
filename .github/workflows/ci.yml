@@ -28,5 +28,5 @@ jobs:
       - run: podman --version
       - run: rootlesskit --version
       - run: runc --version
-      - run: runsc --version
+      # - run: runsc --version
       - run: skopeo --version

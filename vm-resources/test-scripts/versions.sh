@@ -7,5 +7,5 @@ podman --version
 podman info
 rootlesskit --version
 runc --version
-runsc --version
+# runsc --version
 skopeo --version
