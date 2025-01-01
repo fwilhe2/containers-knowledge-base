@@ -10,6 +10,7 @@ Collection of knowledge on containers 🐋📦
 - [Awesome Immutable](https://github.com/castrojo/awesome-immutable)
 - [What Is a Standard Container (2021 edition)](https://iximiuz.com/en/posts/oci-containers/)
 - [lwn: Docker and the OCI container ecosystem](https://lwn.net/Articles/902049/)
+- [reynardsec.com:  Docker Security – Step-by-Step Hardening (Docker Hardening)](https://reynardsec.com/en/docker-platform-security-step-by-step-hardening/)
 
 ### [Namespaces](https://en.wikipedia.org/wiki/Linux_namespaces)
 
