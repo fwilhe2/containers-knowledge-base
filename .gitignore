@@ -1,5 +1,2 @@
-.vagrant
 code
-package.box
-containers-lab*.box
 __pycache__
