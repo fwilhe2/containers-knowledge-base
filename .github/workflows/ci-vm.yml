@@ -23,7 +23,7 @@ env:
 
 jobs:
   virtualbox:
-    runs-on: macos-12
+    runs-on: macos-latest
     timeout-minutes: 100
     steps:
       - uses: actions/checkout@v5
