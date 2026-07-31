@@ -3,6 +3,7 @@ on:
   push:
     paths-ignore:
       - '**.md'
+      - '.github/workflows/ci-lima.yml'
       - 'container-lab.yaml'
       - 'Makefile'
       - 'vm-resources/**'
