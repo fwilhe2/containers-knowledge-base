@@ -378,6 +378,19 @@
         chdir: "{{ home }}/code/fwilhe-containers/aardvark-dns"
         target: install
 
+    # pasta is podman 5's default for the rootless network namespace. It comes
+    # from passt, which is not on GitHub, so it is cloned straight from upstream
+    # rather than from a fork in the fwilhe-containers org.
+    - name: Build passt
+      community.general.make:
+        chdir: "{{ home }}/code/passt"
+
+    - name: Install passt
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/passt"
+        target: install
+
     - name: Build podman
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
@@ -387,25 +400,6 @@
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
         target: install
-
-    - name: Create /etc/containers Directory
-      become: true
-      file:
-        path: /etc/containers
-        state: directory
-        mode: "755"
-
-    # podman defaults to pasta for the rootless network namespace, which would
-    # mean pulling in another dependency. We already build slirp4netns from
-    # source for exactly this job, so point podman at that instead.
-    - name: Configure podman to use the slirp4netns we built
-      become: true
-      ansible.builtin.copy:
-        dest: /etc/containers/containers.conf
-        mode: "644"
-        content: |
-          [network]
-          default_rootless_network_cmd = "slirp4netns"
 
     # The crun lifecycle test needs something listening on the console socket of
     # the container-image bundle. Skipped in the container-based CI, which has no
