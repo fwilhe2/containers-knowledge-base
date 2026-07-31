@@ -52,7 +52,9 @@
         - libprotobuf-c-dev
         - libcap-dev
         - libseccomp-dev
-        - libyajl-dev
+        # crun migrated from yajl to json-c; configure.ac now requires
+        # json-c >= 0.14 unconditionally.
+        - libjson-c-dev
         - go-md2man
         - autoconf
         - python3
