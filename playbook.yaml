@@ -334,6 +334,50 @@
         cmd: cp ctop /usr/local/bin
         chdir: "{{ home }}/code/fwilhe-containers/ctop"
 
+    # podman 5 dropped CNI: it shells out to netavark for networking and
+    # aardvark-dns for name resolution. Both are Rust and require rustc 1.88,
+    # newer than the 1.85 in trixie, so take the toolchain from backports.
+    - name: Enable backports for a Rust new enough to build netavark
+      ansible.builtin.apt_repository:
+        repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main"
+        state: present
+        update_cache: true
+      become: true
+      when: ansible_distribution == 'Debian'
+
+    - name: Install build dependencies for netavark and aardvark-dns
+      apt:
+        state: present
+        name: "{{ item }}"
+        default_release: "{{ ansible_distribution_release }}-backports"
+      loop:
+        - rustc
+        - cargo
+      become: true
+      when: ansible_distribution == 'Debian'
+
+    - name: Build netavark
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/netavark"
+
+    # Installs into /usr/local/libexec/podman, which is on podman's
+    # helper_binaries_dir search path.
+    - name: Install netavark
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/netavark"
+        target: install
+
+    - name: Build aardvark-dns
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/aardvark-dns"
+
+    - name: Install aardvark-dns
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/aardvark-dns"
+        target: install
+
     - name: Build podman
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
@@ -343,6 +387,25 @@
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
         target: install
+
+    - name: Create /etc/containers Directory
+      become: true
+      file:
+        path: /etc/containers
+        state: directory
+        mode: "755"
+
+    # podman defaults to pasta for the rootless network namespace, which would
+    # mean pulling in another dependency. We already build slirp4netns from
+    # source for exactly this job, so point podman at that instead.
+    - name: Configure podman to use the slirp4netns we built
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/containers/containers.conf
+        mode: "644"
+        content: |
+          [network]
+          default_rootless_network_cmd = "slirp4netns"
 
     # The crun lifecycle test needs something listening on the console socket of
     # the container-image bundle. Skipped in the container-based CI, which has no
