@@ -164,12 +164,23 @@
       become: true
       when: ansible_os_family == 'Debian'
 
-    - name: configue bubblewrap
+    - name: Build bubblewrap
       ansible.builtin.shell: |
-        meson _builddir
+        set -e
+        if [ -d _builddir ]; then
+          meson setup --reconfigure _builddir
+        else
+          meson setup _builddir
+        fi
         meson compile -C _builddir
         meson test -C _builddir
-        meson install -C _builddir
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+
+    # Separate task with become, because meson install writes to /usr/local.
+    - name: Install bubblewrap
+      become: true
+      ansible.builtin.shell: meson install -C _builddir
       args:
         chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
 
@@ -181,6 +192,7 @@
           GO_MAKE_TARGET: local
 
     - name: Install ignite
+      become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/ignite"
         target: install
