@@ -123,9 +123,14 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    # runc now defaults to BUILDTAGS "seccomp libpathrs", but libpathrs is not
+    # packaged in Debian or Ubuntu, so pkg-config cannot find it and the cgo
+    # build fails. Drop the tag; the Makefile treats a "-" prefix as a removal.
     - name: Build runc
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
+        params:
+          RUNC_BUILDTAGS: "-libpathrs"
 
     - name: Install runc
       become: true
