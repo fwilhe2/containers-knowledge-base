@@ -50,6 +50,29 @@ Layering, Builder Pattern, Multi-Arch builds
 
 ### [Rootless Containers](https://rootlesscontaine.rs/)
 
+## Playground Environment
+
+[`container-lab.yaml`](./container-lab.yaml) defines a [lima](https://lima-vm.io/) VM running Debian 13, in which [an Ansible playbook](./playbook.yaml) builds the whole container stack from source.
+
+```sh
+make vm         # create and start the VM
+make provision  # build and install everything inside it (slow)
+make test       # run the smoke tests inside it
+make shell      # get a shell in the VM
+make stop
+make delete
+```
+
+The playbook installs binaries into `/usr/local` and pulls in a long list of build dependencies, so run it in the VM rather than on your own machine.
+
+To use the VM with the [ssh remote plugin for vs code](https://code.visualstudio.com/docs/remote/ssh), add its ssh config once:
+
+```sh
+echo "Include ${LIMA_HOME:-$HOME/.lima}/container-lab/ssh.config" >> ~/.ssh/config
+```
+
+After this you can connect to the host `lima-container-lab`.
+
 ## Talks
 
 [Containers at Facebook - Lindsay Salisbury](https://youtu.be/_Qc9jBk18w8)

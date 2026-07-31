@@ -19,11 +19,12 @@
       tags: containers
       loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
 
-    - name: Add source repository into sources list
-      ansible.builtin.apt_repository:
-        repo: deb-src https://mirrors.kernel.org/ubuntu/ jammy main restricted
-        state: present
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
       become: true
+      when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for runc
       apt:
@@ -323,3 +324,45 @@
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
         target: install
+
+    # The crun lifecycle test needs something listening on the console socket of
+    # the container-image bundle. Skipped in the container-based CI, which has no
+    # systemd and does not run that test.
+    - name: Install netcat for the console socket helper
+      apt:
+        state: present
+        name: netcat-openbsd
+      become: true
+      when: ansible_os_family == 'Debian' and ansible_service_mgr == 'systemd'
+
+    - name: Create systemd user unit directory
+      file:
+        path: "{{ home }}/.config/systemd/user"
+        state: directory
+        mode: "755"
+      when: ansible_service_mgr == 'systemd'
+
+    - name: Install the console socket helper unit
+      ansible.builtin.copy:
+        src: vm-resources/container-socket.service
+        dest: "{{ home }}/.config/systemd/user/container-socket.service"
+        mode: "644"
+      when: ansible_service_mgr == 'systemd'
+
+    # Without lingering the user manager is torn down when the last ssh session
+    # closes, so the socket would not be listening when `make test` connects.
+    - name: Enable lingering for the console socket helper
+      ansible.builtin.command:
+        cmd: loginctl enable-linger {{ ansible_user_id }}
+        creates: /var/lib/systemd/linger/{{ ansible_user_id }}
+      become: true
+      when: ansible_service_mgr == 'systemd'
+
+    - name: Enable the console socket helper
+      ansible.builtin.systemd_service:
+        name: container-socket.service
+        scope: user
+        daemon_reload: true
+        enabled: true
+        state: started
+      when: ansible_service_mgr == 'systemd'

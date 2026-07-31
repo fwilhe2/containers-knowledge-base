@@ -1,0 +1,74 @@
+# Lima VM for the containers lab: a Debian 13 guest in which the whole
+# container stack is built from source by playbook.yaml.
+#
+#   make vm         create and start the VM
+#   make provision  build and install the stack inside it (slow)
+#   make test       run the smoke tests inside it
+#
+# Reference: https://lima-vm.io/docs/config/
+
+minimumLimaVersion: 2.0.0
+
+# Digest-pinned Debian 13 (trixie) cloud images for x86_64/aarch64/ppc64le,
+# with daily-build fallbacks. Shipped with lima, so it tracks new point releases.
+base:
+  - template:_images/debian-13
+
+# Building runc, crun, podman, containerd, cri-o, ... from source is hungry.
+cpus: 4
+memory: "8GiB"
+disk: "60GiB"
+
+# The host home is deliberately NOT mounted. The playbook clones into ~/code and
+# `make install`s into /usr/local, and none of that may touch the host. `make vm`
+# adds a single read-only mount of this checkout, at its host path (the guest home
+# is /home/<user>.guest, so that can never collide with the guest's own ~/code).
+mounts: []
+
+# We build our own containerd, so lima must not provision one.
+containerd:
+  system: false
+  user: false
+
+# Makes the VM reachable as `lima-container-lab` for VS Code Remote-SSH etc. after:
+#   echo "Include ${LIMA_HOME:-$HOME/.lima}/container-lab/ssh.config" >> ~/.ssh/config
+ssh:
+  loadDotSSHPubKeys: true
+
+# Prerequisites only. The playbook runs via `make provision` instead of here, so
+# that VM creation stays fast and the long build can be retried without recreating
+# the VM. `sshfs` for the host mount is installed by lima itself.
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update
+      apt-get install -y --no-install-recommends \
+        ansible git python3-apt python3-pytest sudo
+
+probes:
+  - description: "cloud-init to finish and ansible to be usable"
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      # Waiting for cloud-init matters: `make vm` must not report success while
+      # apt still holds the dpkg lock, or the `make provision` right after it
+      # fails. Generous timeout because the Debian `ansible` package pulls in
+      # ~200MB of collections. Two subtleties:
+      #  - match on the status *word*, not the exit code: lima's own cloud-config
+      #    uses deprecated keys, so cloud-init ends up "degraded done" and
+      #    `cloud-init status --wait` exits 2 even though it finished fine.
+      #  - run `ansible-playbook --version` rather than `command -v`, since the
+      #    binary exists from the moment the package is unpacked.
+      if ! timeout 900s bash -c '
+        until [ "$(cloud-init status 2>/dev/null | cut -d" " -f2)" = "done" ] &&
+              ansible-playbook --version >/dev/null 2>&1; do
+          sleep 5
+        done'; then
+        echo >&2 "cloud-init did not finish, or ansible is not usable"
+        exit 1
+      fi
+    hint: |
+      See "/var/log/cloud-init-output.log" in the guest.

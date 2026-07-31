@@ -1,14 +1,15 @@
 [Unit]
-Description=Container Socket Service
-After=network.target
+Description=Console socket for the crun/runc container lifecycle tests
 StartLimitIntervalSec=0
 
 [Service]
 Type=simple
 Restart=always
 RestartSec=1
-User=vagrant
-ExecStart=nc -lkU /home/vagrant/code/fwilhe-containers/container-image/mySocket.sock
+# Installed as a systemd *user* unit by playbook.yaml, so %h resolves to the
+# home of whoever provisioned the machine - no user name is hardcoded here.
+ExecStartPre=-/bin/rm -f %h/code/fwilhe-containers/container-image/mySocket.sock
+ExecStart=/usr/bin/nc -lkU %h/code/fwilhe-containers/container-image/mySocket.sock
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
