@@ -498,7 +498,7 @@
         - cgroup-tools        # lscgroup, cgcreate, cgexec
         - stress-ng           # make the limits actually bite
         # Images and filesystems
-        - dive                # interactive image layer explorer
+        # No dive here: it is not packaged in Debian, and this list is apt-only.
         - umoci               # unpack an OCI image into a bundle by hand
         - jq
         - tree
