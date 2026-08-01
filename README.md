@@ -12,6 +12,11 @@ Collection of knowledge on containers 🐋📦
 - [lwn: Docker and the OCI container ecosystem](https://lwn.net/Articles/902049/)
 - [reynardsec.com:  Docker Security – Step-by-Step Hardening (Docker Hardening)](https://reynardsec.com/en/docker-platform-security-step-by-step-hardening/)
 
+### Learning by building
+
+- [rubber-docker](https://github.com/Fewbytes/rubber-docker) — a workshop that rebuilds Docker from scratch, one namespace and cgroup at a time
+- [`container-lab.yaml`](./container-lab.yaml) — this repo's own playground, see [Playground Environment](#playground-environment)
+
 ### [Namespaces](https://en.wikipedia.org/wiki/Linux_namespaces)
 
 [Digging into Linux namespaces](https://blog.quarkslab.com/digging-into-linux-namespaces-part-1.html)
@@ -33,12 +38,14 @@ Copy-on-write filesystems
 - [Podman](https://github.com/containers/podman)
 - [CRI-O](https://github.com/cri-o/cri-o)
 - [bubblewrap](https://github.com/containers/bubblewrap)/flatpak
-- [containerd](https://github.com/containerd/containerd)
+- [containerd](https://github.com/containerd/containerd) ([getting started](https://containerd.io/docs/getting-started/))
 - [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
 - [runc](https://github.com/opencontainers/runc)
 - [crun](https://github.com/containers/crun)
 
 ## Container Images
+
+- [OCIv2 images, part I: tar is bad](https://www.cyphar.com/blog/post/20190121-ociv2-images-i-tar)
 
 ### Building Images
 
@@ -46,9 +53,18 @@ Copy-on-write filesystems
 
 Layering, Builder Pattern, Multi-Arch builds
 
+#### Beyond Dockerfiles
+
+- [Move over Dockerfiles: the new way to craft containers](https://www.chainguard.dev/unchained/move-over-dockerfiles-the-new-way-to-craft-containers)
+- [OCI patterns](https://github.com/ipedrazas/oci-patterns)
+
 ## Running Containers
 
 ### [Rootless Containers](https://rootlesscontaine.rs/)
+
+### Testing
+
+- [Pumba](https://github.com/alexei-led/pumba) — chaos testing for containers
 
 ## Playground Environment
 
@@ -65,6 +81,8 @@ make delete
 
 The playbook installs binaries into `/usr/local` and pulls in a long list of build dependencies, so run it in the VM rather than on your own machine.
 
+The VM also gets a set of tools for watching the stack at runtime — `strace`, `lsns`, `nsenter`, `bpftrace`, `execsnoop`, `dive`, `capsh`, `nft` — plus the `namespaces(7)` / `cgroups(7)` / `capabilities(7)` man pages, so the internals can be explored offline. Unlike the container tools these are installed from apt, not built from source.
+
 To use the VM with the [ssh remote plugin for vs code](https://code.visualstudio.com/docs/remote/ssh), add its ssh config once:
 
 ```sh
@@ -78,5 +96,3 @@ After this you can connect to the host `lima-container-lab`.
 [Containers at Facebook - Lindsay Salisbury](https://youtu.be/_Qc9jBk18w8)
 
 systemd, BTRFS, ...
-
-https://www.cyphar.com/blog/post/20190121-ociv2-images-i-tar
