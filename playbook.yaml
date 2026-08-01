@@ -421,6 +421,19 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    # Installing the package is not enough. lima enables lingering, so the user
+    # manager is already running by the time we get here and will not pick up
+    # the newly installed dbus.socket on its own; without this, /run/user/<uid>/bus
+    # never appears and podman still finds no session. Not `enabled`, because
+    # dbus.socket is static.
+    - name: Start the user D-Bus socket
+      ansible.builtin.systemd_service:
+        name: dbus.socket
+        scope: user
+        daemon_reload: true
+        state: started
+      when: ansible_service_mgr == 'systemd'
+
     - name: Build podman
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
