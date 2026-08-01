@@ -203,6 +203,24 @@
         params:
           GO_MAKE_TARGET: local
 
+    # flintlock is the community-maintained microVM manager from the same
+    # lineage as ignite, and replaces the archived footloose. Pure Go, so the
+    # toolchain installed for runc is all it needs.
+    - name: Build flintlockd
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/flintlock"
+        target: build-flintlockd
+
+    # flintlock's Makefile has no install target; it only builds into ./bin.
+    # Only flintlockd is installed: flintlock-metrics is a separate Prometheus
+    # exporter the lab has no use for.
+    - name: Install flintlockd
+      become: true
+      ansible.builtin.command:
+        cmd: cp bin/flintlockd /usr/local/bin
+        chdir: "{{ home }}/code/fwilhe-containers/flintlock"
+      changed_when: true
+
     - name: Build containerd
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/containerd"
