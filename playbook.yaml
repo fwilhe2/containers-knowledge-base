@@ -345,7 +345,8 @@
       become: true
       when: ansible_distribution == 'Debian'
 
-    - name: Install build dependencies for netavark and aardvark-dns
+    # Only the toolchain comes from backports; everything else from stable.
+    - name: Install a Rust toolchain new enough for netavark
       apt:
         state: present
         name: "{{ item }}"
@@ -355,6 +356,17 @@
         - cargo
       become: true
       when: ansible_distribution == 'Debian'
+
+    - name: Install build dependencies for netavark and aardvark-dns
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        # netavark's dhcp-proxy generates its client code from protobuf at
+        # build time, via prost-build, which shells out to protoc.
+        - protobuf-compiler
+      become: true
+      when: ansible_os_family == 'Debian'
 
     - name: Build netavark
       community.general.make:
