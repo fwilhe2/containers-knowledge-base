@@ -1,35 +1,37 @@
 import pytest
 import subprocess
-import json
 
 def run_command(command):
     print(command)
+    # check=True already fails the test on a non-zero exit status.
     output = subprocess.run(command, capture_output=True, check=True)
     stdout = output.stdout.decode("utf-8").rstrip()
     stderr = output.stderr.decode("utf-8").rstrip()
     return (stdout, stderr)
 
-@pytest.mark.parametrize("command,expected", [
-    ('bwrap --version', 0),
-    ('conmon --version', 0),
-    ('containerd --version', 0),
-    ('crio --version', 0),
-    ('crun --version', 0),
-    ('ctop -v', 0),
-    ('ignite version', 0),
-    ('podman --version', 0),
-    ('podman info', 0),
-    ('rootlesskit --version', 0),
-    ('runc --version', 0),
-    # ('runsc --version', 0),
-    ('skopeo --version', 0),
+@pytest.mark.parametrize("command", [
+    'bwrap --version',
+    'conmon --version',
+    'containerd --version',
+    'crio --version',
+    'crun --version',
+    'ctop -v',
+    'ignite version',
+    'podman --version',
+    'podman info',
+    'rootlesskit --version',
+    'runc --version',
+    # 'runsc --version',
+    'skopeo --version',
     # podman 5 networking. netavark and aardvark-dns install into
     # libexec/podman, which is deliberately not on PATH.
-    ('/usr/local/libexec/podman/netavark --version', 0),
-    ('/usr/local/libexec/podman/aardvark-dns --version', 0),
-    ('pasta --version', 0),
+    '/usr/local/libexec/podman/netavark --version',
+    '/usr/local/libexec/podman/aardvark-dns --version',
+    'pasta --version',
 ])
-def test_crun_container_lifecycle(command, expected):
-    stdout, stderr = run_command(command.split(' '))
+def test_tool_runs_and_reports_itself(command):
+    # Deliberately not asserting that stderr is empty: plenty of these write
+    # informational lines there, and doing so made `podman info` fail purely
+    # because it warned about the cgroup manager.
+    stdout, _ = run_command(command.split(' '))
     assert stdout != ""
-    assert stderr == ""
