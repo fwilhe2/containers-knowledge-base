@@ -21,14 +21,51 @@ jobs:
     # Matches the Debian 13 guest defined in container-lab.yaml. ubuntu:24.10
     # (oracular) went end-of-life in July 2025 and its archive is gone.
     container: "debian:13"
+    env:
+      # Container jobs run with HOME=/github/home, so the toolchain caches are
+      # not under /root. Kept in one place because restore and save must agree.
+      CACHE_PATHS: |
+        /github/home/.cache/go-build
+        /github/home/go/pkg/mod
+        /github/home/.cargo/registry
+        /github/home/.cargo/git
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install dependencies
         run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential sudo
       - run: id
 
+      # The build is almost entirely Go and Rust compilation, so the compiler
+      # and dependency caches are the only thing worth caching. Sources are
+      # cloned fresh each run, but both caches are content-addressed, so
+      # unchanged dependencies still hit.
+      #
+      # Restore on every branch, falling back to whatever main last saved.
+      # Save only on main: a cache entry here is gigabytes, the repo-wide limit
+      # is 10 GB with LRU eviction, and letting every PR save its own would
+      # evict main's along with the lima job's guest image.
+      - name: Restore build caches
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.CACHE_PATHS }}
+          key: build-debian13-${{ github.sha }}
+          restore-keys: |
+            build-debian13-
+
       - name: Run demo playbook
         run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
+
+      - name: Save build caches
+        if: success() && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.CACHE_PATHS }}
+          key: build-debian13-${{ github.sha }}
+
+      # So the caches can be sized against the 10 GB repo-wide budget.
+      - name: Report cache sizes
+        if: always()
+        run: du -sh /github/home/.cache/go-build /github/home/go/pkg/mod /github/home/.cargo/registry /github/home/.cargo/git 2>/dev/null || true
 
       # The list of tools lives in versions.sh so it is not duplicated here.
       - name: Check version of built tools
