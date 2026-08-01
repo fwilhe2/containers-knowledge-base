@@ -476,3 +476,54 @@
         enabled: true
         state: started
       when: ansible_service_mgr == 'systemd'
+
+    # Tools for poking at the stack while it runs, rather than building it.
+    # These come from apt on purpose: the from-source builds are reserved for
+    # container tools and their dependencies, these are just instruments.
+    # Skipped in the container-based CI, which has neither a real kernel nor
+    # systemd, so half of them could not work there anyway.
+    - name: Install introspection tools
+      apt:
+        state: present
+        name:
+        # Namespaces and processes
+        - strace
+        - ltrace
+        - util-linux          # lsns, nsenter, unshare
+        - psmisc              # pstree
+        - lsof
+        - htop
+        - iotop-c
+        # cgroups and resource limits
+        - cgroup-tools        # lscgroup, cgcreate, cgexec
+        - stress-ng           # make the limits actually bite
+        # Images and filesystems
+        # No dive here: it is not packaged in Debian, and this list is apt-only.
+        - umoci               # unpack an OCI image into a bundle by hand
+        - jq
+        - tree
+        - ncdu
+        - fuse-overlayfs
+        # Networking
+        - iproute2            # ip netns, ip link
+        - nftables            # the rules netavark writes
+        - conntrack
+        - tcpdump
+        - bind9-dnsutils      # dig, to query aardvark-dns
+        - socat
+        - iputils-ping
+        # Capabilities, seccomp, LSMs
+        - libcap2-bin         # capsh, getcap
+        - seccomp             # scmp_sys_resolver, to decode syscall numbers
+        - apparmor-utils
+        - auditd              # ausearch, for otherwise silent denials
+        # Tracing and eBPF
+        - bpftrace
+        - bpfcc-tools         # execsnoop, opensnoop, capable, tcpconnect
+        - trace-cmd
+        - linux-perf
+        # The reference material for all of the above, offline
+        - manpages            # namespaces(7), cgroups(7), capabilities(7)
+        - manpages-dev        # seccomp(2), pivot_root(2)
+      become: true
+      when: ansible_os_family == 'Debian' and ansible_service_mgr == 'systemd'
