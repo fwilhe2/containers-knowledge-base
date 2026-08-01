@@ -16,6 +16,7 @@ def run_command(command):
     'crio --version',
     'crun --version',
     'ctop -v',
+    'flintlockd version',
     'ignite version',
     'podman --version',
     'podman info',
