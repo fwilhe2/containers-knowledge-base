@@ -134,11 +134,17 @@
         params:
           RUNC_BUILDTAGS: "-libpathrs"
 
+    # runc's Makefile hardcodes BINDIR to $(PREFIX)/sbin, which is not on a
+    # normal user's PATH on Debian. Every other component here lands in
+    # /usr/local/bin, so put runc there too, otherwise it is only usable as
+    # root and `runc --version` fails for the unprivileged lab user.
     - name: Install runc
       become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
         target: install
+        params:
+          BINDIR: /usr/local/bin
 
     - name: configue crun
       ansible.builtin.shell: ./autogen.sh && ./configure
@@ -402,6 +408,18 @@
       community.general.make:
         chdir: "{{ home }}/code/passt"
         target: install
+
+    # Rootless podman defaults to the systemd cgroup manager, which needs a
+    # per-user D-Bus session. The Debian cloud image ships no dbus-user-session,
+    # so podman warns about the missing user session and falls back to cgroupfs.
+    - name: Install runtime dependencies for podman
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - dbus-user-session
+      become: true
+      when: ansible_os_family == 'Debian'
 
     - name: Build podman
       community.general.make:

@@ -16,9 +16,10 @@ provision:
 		ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
 
 ## Run the smoke tests inside the VM (requires `make provision` first).
+## The checkout is mounted read-only, so pytest cannot write its cache.
 test:
 	limactl shell --workdir '$(CURDIR)/vm-resources/test-scripts' '$(VM)' \
-		python3 -m pytest -sv
+		python3 -m pytest -sv -p no:cacheprovider
 
 shell:
 	limactl shell '$(VM)'

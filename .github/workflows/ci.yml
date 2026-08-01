@@ -34,3 +34,8 @@ jobs:
       - run: runc --version
       # - run: runsc --version
       - run: skopeo --version
+      # podman 5 networking. netavark and aardvark-dns install into
+      # libexec/podman, which is deliberately not on PATH.
+      - run: /usr/local/libexec/podman/netavark --version
+      - run: /usr/local/libexec/podman/aardvark-dns --version
+      - run: pasta --version
