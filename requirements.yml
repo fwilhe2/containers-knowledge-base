@@ -1,0 +1,5 @@
+---
+# Collections the playbook depends on. Installed as a side effect of the
+# `ansible` package on Debian, but ansible-lint in CI needs them explicitly.
+collections:
+  - name: community.general

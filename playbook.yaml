@@ -1,17 +1,20 @@
 ---
-- hosts: all
+- name: Build the Linux containers lab from source
+  hosts: all
 
   vars:
     home: "{{ lookup('env', 'HOME') }}"
 
   tasks:
     - name: Create ~/code Directory
-      file:
+      ansible.builtin.file:
         path: "{{ home }}/code"
         state: directory
         mode: "750"
 
-    - name: Clone container-related git repos
+    # noqa latest[git]: tracking the fork's default branch is the point;
+    # update-forks.py controls when upstream changes land.
+    - name: Clone container-related git repos # noqa: latest[git]
       ansible.builtin.git:
         repo: "{{ item }}"
         dest: '{{ home }}/code/{{ item | urlsplit("path") }}'
@@ -20,43 +23,43 @@
       loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
 
     - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
       become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for runc
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - golang
-        - libseccomp2
-        - libseccomp-dev
+          - golang
+          - libseccomp2
+          - libseccomp-dev
       become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for crun
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - make
-        - git
-        - gcc
-        - build-essential
-        - pkgconf
-        - libtool
-        - libsystemd-dev
-        - libprotobuf-c-dev
-        - libcap-dev
-        - libseccomp-dev
-        # crun migrated from yajl to json-c; configure.ac now requires
-        # json-c >= 0.14 unconditionally.
-        - libjson-c-dev
-        - go-md2man
-        - autoconf
-        - python3
-        - automake
+          - make
+          - git
+          - gcc
+          - build-essential
+          - pkgconf
+          - libtool
+          - libsystemd-dev
+          - libprotobuf-c-dev
+          - libcap-dev
+          - libseccomp-dev
+          # crun migrated from yajl to json-c; configure.ac now requires
+          # json-c >= 0.14 unconditionally.
+          - libjson-c-dev
+          - go-md2man
+          - autoconf
+          - python3
+          - automake
       become: true
       when: ansible_os_family == 'Debian'
 
@@ -65,56 +68,56 @@
         chdir: "{{ home }}/code/fwilhe-containers/container-image"
 
     - name: Install build dependencies for skopeo
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - libdevmapper-dev
-        - libgpgme-dev
-        - go-md2man
+          - libdevmapper-dev
+          - libgpgme-dev
+          - go-md2man
       become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for youki
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - pkg-config
-        - libsystemd-dev
-        - libdbus-glib-1-dev
-        - build-essential
-        - libelf-dev
-        - libseccomp-dev
+          - pkg-config
+          - libsystemd-dev
+          - libdbus-glib-1-dev
+          - build-essential
+          - libelf-dev
+          - libseccomp-dev
       become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for containerd
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - libbtrfs-dev
-        - btrfs-progs
+          - libbtrfs-dev
+          - btrfs-progs
       become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for conmon
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - gcc
-        - git
-        - libc6-dev
-        - libglib2.0-dev
-        - libseccomp-dev
-        - pkg-config
-        - make
+          - gcc
+          - git
+          - libc6-dev
+          - libglib2.0-dev
+          - libseccomp-dev
+          - pkg-config
+          - make
       become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install runtime dependencies for rootlesskit
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - uidmap
+          - uidmap
       become: true
       when: ansible_os_family == 'Debian'
 
@@ -143,6 +146,7 @@
       ansible.builtin.shell: ./autogen.sh && ./configure
       args:
         chdir: "{{ home }}/code/fwilhe-containers/crun"
+      changed_when: true
 
     - name: Build crun
       community.general.make:
@@ -155,10 +159,10 @@
         target: install
 
     - name: Install build dependencies for bubblewrap
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - meson
+          - meson
       become: true
       when: ansible_os_family == 'Debian'
 
@@ -174,13 +178,15 @@
         meson test -C _builddir
       args:
         chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+      changed_when: true
 
     # Separate task with become, because meson install writes to /usr/local.
     - name: Install bubblewrap
       become: true
-      ansible.builtin.shell: meson install -C _builddir
-      args:
+      ansible.builtin.command:
+        cmd: meson install -C _builddir
         chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+      changed_when: true
 
     - name: Build ignite
       community.general.make:
@@ -202,13 +208,14 @@
         chdir: "{{ home }}/code/fwilhe-containers/containerd"
 
     - name: Build CNI plugins
-      ansible.builtin.shell: ./build_linux.sh
-      args:
+      ansible.builtin.command:
+        cmd: ./build_linux.sh
         chdir: "{{ home }}/code/fwilhe-containers/plugins"
+      changed_when: true
 
     - name: Create /usr/local/libexec/cni Directory
       become: true
-      file:
+      ansible.builtin.file:
         path: /usr/local/libexec/cni
         state: directory
         # Not 777: root runs these plugins for pod networking, so a
@@ -220,6 +227,7 @@
       ansible.builtin.shell: cp bin/* /usr/local/libexec/cni
       args:
         chdir: "{{ home }}/code/fwilhe-containers/plugins"
+      changed_when: true
 
     - name: Install containerd
       become: true
@@ -297,13 +305,13 @@
         target: install
 
     - name: Install build dependencies for slirp4netns
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - libglib2.0-dev
-        - libslirp-dev
-        - libcap-dev
-        - libseccomp-dev
+          - libglib2.0-dev
+          - libslirp-dev
+          - libcap-dev
+          - libseccomp-dev
       become: true
       when: ansible_os_family == 'Debian'
 
@@ -311,6 +319,7 @@
       ansible.builtin.shell: ./autogen.sh && ./configure --prefix=/usr
       args:
         chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
+      changed_when: true
 
     - name: Build slirp4netns for rootless networking in podman
       community.general.make:
@@ -330,9 +339,10 @@
     # ctop's Makefile has no install target.
     - name: Install ctop
       become: true
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: cp ctop /usr/local/bin
         chdir: "{{ home }}/code/fwilhe-containers/ctop"
+      changed_when: true
 
     # podman 5 dropped CNI: it shells out to netavark for networking and
     # aardvark-dns for name resolution. Both are Rust and require rustc 1.88,
@@ -347,22 +357,22 @@
 
     # Only the toolchain comes from backports; everything else from stable.
     - name: Install a Rust toolchain new enough for netavark
-      apt:
+      ansible.builtin.apt:
         state: present
         default_release: "{{ ansible_distribution_release }}-backports"
         name:
-        - rustc
-        - cargo
+          - rustc
+          - cargo
       become: true
       when: ansible_distribution == 'Debian'
 
     - name: Install build dependencies for netavark and aardvark-dns
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        # netavark's dhcp-proxy generates its client code from protobuf at
-        # build time, via prost-build, which shells out to protoc.
-        - protobuf-compiler
+          # netavark's dhcp-proxy generates its client code from protobuf at
+          # build time, via prost-build, which shells out to protoc.
+          - protobuf-compiler
       become: true
       when: ansible_os_family == 'Debian'
 
@@ -405,10 +415,10 @@
     # per-user D-Bus session. The Debian cloud image ships no dbus-user-session,
     # so podman warns about the missing user session and falls back to cgroupfs.
     - name: Install runtime dependencies for podman
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        - dbus-user-session
+          - dbus-user-session
       become: true
       when: ansible_os_family == 'Debian'
 
@@ -439,14 +449,14 @@
     # the container-image bundle. Skipped in the container-based CI, which has no
     # systemd and does not run that test.
     - name: Install netcat for the console socket helper
-      apt:
+      ansible.builtin.apt:
         state: present
         name: netcat-openbsd
       become: true
       when: ansible_os_family == 'Debian' and ansible_service_mgr == 'systemd'
 
     - name: Create systemd user unit directory
-      file:
+      ansible.builtin.file:
         path: "{{ home }}/.config/systemd/user"
         state: directory
         mode: "755"
@@ -483,47 +493,47 @@
     # Skipped in the container-based CI, which has neither a real kernel nor
     # systemd, so half of them could not work there anyway.
     - name: Install introspection tools
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
-        # Namespaces and processes
-        - strace
-        - ltrace
-        - util-linux          # lsns, nsenter, unshare
-        - psmisc              # pstree
-        - lsof
-        - htop
-        - iotop-c
-        # cgroups and resource limits
-        - cgroup-tools        # lscgroup, cgcreate, cgexec
-        - stress-ng           # make the limits actually bite
-        # Images and filesystems
-        # No dive here: it is not packaged in Debian, and this list is apt-only.
-        - umoci               # unpack an OCI image into a bundle by hand
-        - jq
-        - tree
-        - ncdu
-        - fuse-overlayfs
-        # Networking
-        - iproute2            # ip netns, ip link
-        - nftables            # the rules netavark writes
-        - conntrack
-        - tcpdump
-        - bind9-dnsutils      # dig, to query aardvark-dns
-        - socat
-        - iputils-ping
-        # Capabilities, seccomp, LSMs
-        - libcap2-bin         # capsh, getcap
-        - seccomp             # scmp_sys_resolver, to decode syscall numbers
-        - apparmor-utils
-        - auditd              # ausearch, for otherwise silent denials
-        # Tracing and eBPF
-        - bpftrace
-        - bpfcc-tools         # execsnoop, opensnoop, capable, tcpconnect
-        - trace-cmd
-        - linux-perf
-        # The reference material for all of the above, offline
-        - manpages            # namespaces(7), cgroups(7), capabilities(7)
-        - manpages-dev        # seccomp(2), pivot_root(2)
+          # Namespaces and processes
+          - strace
+          - ltrace
+          - util-linux # lsns, nsenter, unshare
+          - psmisc # pstree
+          - lsof
+          - htop
+          - iotop-c
+          # cgroups and resource limits
+          - cgroup-tools # lscgroup, cgcreate, cgexec
+          - stress-ng # make the limits actually bite
+          # Images and filesystems
+          # No dive here: it is not packaged in Debian, and this list is apt-only.
+          - umoci # unpack an OCI image into a bundle by hand
+          - jq
+          - tree
+          - ncdu
+          - fuse-overlayfs
+          # Networking
+          - iproute2 # ip netns, ip link
+          - nftables # the rules netavark writes
+          - conntrack
+          - tcpdump
+          - bind9-dnsutils # dig, to query aardvark-dns
+          - socat
+          - iputils-ping
+          # Capabilities, seccomp, LSMs
+          - libcap2-bin # capsh, getcap
+          - seccomp # scmp_sys_resolver, to decode syscall numbers
+          - apparmor-utils
+          - auditd # ausearch, for otherwise silent denials
+          # Tracing and eBPF
+          - bpftrace
+          - bpfcc-tools # execsnoop, opensnoop, capable, tcpconnect
+          - trace-cmd
+          - linux-perf
+          # The reference material for all of the above, offline
+          - manpages # namespaces(7), cgroups(7), capabilities(7)
+          - manpages-dev # seccomp(2), pivot_root(2)
       become: true
       when: ansible_os_family == 'Debian' and ansible_service_mgr == 'systemd'

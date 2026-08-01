@@ -2,11 +2,11 @@ name: CI in Docker (fast, no full system-access)
 on:
   push:
     paths-ignore:
-      - '**.md'
-      - '.github/workflows/ci-lima.yml'
-      - 'container-lab.yaml'
-      - 'Makefile'
-      - 'vm-resources/**'
+      - "**.md"
+      - ".github/workflows/ci-lima.yml"
+      - "container-lab.yaml"
+      - "Makefile"
+      - "vm-resources/**"
   workflow_dispatch:
 
 # A full build takes ~20 minutes, so never let pushes pile up on one branch.
@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 60
     # Matches the Debian 13 guest defined in container-lab.yaml. ubuntu:24.10
     # (oracular) went end-of-life in July 2025 and its archive is gone.
-    container: 'debian:13'
+    container: "debian:13"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install dependencies
