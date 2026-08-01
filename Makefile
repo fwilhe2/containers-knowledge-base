@@ -1,6 +1,6 @@
 VM ?= container-lab
 
-.PHONY: vm provision test shell stop delete format
+.PHONY: vm provision test shell stop delete format lint
 
 ## Create (if needed) and start the lab VM, with this checkout mounted read-only.
 ## Lima mounts it at the same path it has on the host, so $(CURDIR) is also the
@@ -32,3 +32,10 @@ delete:
 
 format:
 	./format-files.sh
+
+## Same checks the lint workflow runs. Needs ansible-lint and npx on PATH;
+## ANSIBLE_COLLECTIONS_PATH points at the collections the ansible package ships,
+## since the playbook uses community.general.make.
+lint:
+	ANSIBLE_COLLECTIONS_PATH=/usr/lib/python3/dist-packages ansible-lint playbook.yaml
+	npx --yes prettier --check README.md CLAUDE.md "./**/*.yml" "./**/*.yaml"

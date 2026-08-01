@@ -3,12 +3,12 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '.github/workflows/ci-lima.yml'
-      - 'container-lab.yaml'
-      - 'Makefile'
-      - 'playbook.yaml'
-      - 'git-repos.txt'
-      - 'vm-resources/**'
+      - ".github/workflows/ci-lima.yml"
+      - "container-lab.yaml"
+      - "Makefile"
+      - "playbook.yaml"
+      - "git-repos.txt"
+      - "vm-resources/**"
 
 # This job is expensive, so never let two of them pile up for the same branch.
 concurrency:
