@@ -29,8 +29,7 @@
     - name: Install build dependencies for runc
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - golang
         - libseccomp2
         - libseccomp-dev
@@ -40,8 +39,7 @@
     - name: Install build dependencies for crun
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - make
         - git
         - gcc
@@ -69,8 +67,7 @@
     - name: Install build dependencies for skopeo
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - libdevmapper-dev
         - libgpgme-dev
         - go-md2man
@@ -80,8 +77,7 @@
     - name: Install build dependencies for youki
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - pkg-config
         - libsystemd-dev
         - libdbus-glib-1-dev
@@ -94,8 +90,7 @@
     - name: Install build dependencies for containerd
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - libbtrfs-dev
         - btrfs-progs
       become: true
@@ -104,8 +99,7 @@
     - name: Install build dependencies for conmon
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - gcc
         - git
         - libc6-dev
@@ -119,8 +113,7 @@
     - name: Install runtime dependencies for rootlesskit
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - uidmap
       become: true
       when: ansible_os_family == 'Debian'
@@ -146,7 +139,7 @@
         params:
           BINDIR: /usr/local/bin
 
-    - name: configue crun
+    - name: Configure crun
       ansible.builtin.shell: ./autogen.sh && ./configure
       args:
         chdir: "{{ home }}/code/fwilhe-containers/crun"
@@ -164,8 +157,7 @@
     - name: Install build dependencies for bubblewrap
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - meson
       become: true
       when: ansible_os_family == 'Debian'
@@ -219,7 +211,9 @@
       file:
         path: /usr/local/libexec/cni
         state: directory
-        mode: "777"
+        # Not 777: root runs these plugins for pod networking, so a
+        # world-writable directory would let any user swap them out.
+        mode: "755"
 
     - name: Install CNI plugins
       become: true
@@ -305,8 +299,7 @@
     - name: Install build dependencies for slirp4netns
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - libglib2.0-dev
         - libslirp-dev
         - libcap-dev
@@ -314,7 +307,7 @@
       become: true
       when: ansible_os_family == 'Debian'
 
-    - name: configue slirp4netns
+    - name: Configure slirp4netns
       ansible.builtin.shell: ./autogen.sh && ./configure --prefix=/usr
       args:
         chdir: "{{ home }}/code/fwilhe-containers/slirp4netns"
@@ -334,7 +327,8 @@
         chdir: "{{ home }}/code/fwilhe-containers/ctop"
         target: build
 
-    - name: Build ctop
+    # ctop's Makefile has no install target.
+    - name: Install ctop
       become: true
       ansible.builtin.shell:
         cmd: cp ctop /usr/local/bin
@@ -355,9 +349,8 @@
     - name: Install a Rust toolchain new enough for netavark
       apt:
         state: present
-        name: "{{ item }}"
         default_release: "{{ ansible_distribution_release }}-backports"
-      loop:
+        name:
         - rustc
         - cargo
       become: true
@@ -366,8 +359,7 @@
     - name: Install build dependencies for netavark and aardvark-dns
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         # netavark's dhcp-proxy generates its client code from protobuf at
         # build time, via prost-build, which shells out to protoc.
         - protobuf-compiler
@@ -415,8 +407,7 @@
     - name: Install runtime dependencies for podman
       apt:
         state: present
-        name: "{{ item }}"
-      loop:
+        name:
         - dbus-user-session
       become: true
       when: ansible_os_family == 'Debian'

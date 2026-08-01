@@ -9,9 +9,15 @@ on:
       - 'vm-resources/**'
   workflow_dispatch:
 
+# A full build takes ~20 minutes, so never let pushes pile up on one branch.
+concurrency:
+  group: ci-docker-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     # Matches the Debian 13 guest defined in container-lab.yaml. ubuntu:24.10
     # (oracular) went end-of-life in July 2025 and its archive is gone.
     container: 'debian:13'
@@ -20,22 +26,25 @@ jobs:
       - name: Install dependencies
         run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq ansible git python3-apt build-essential sudo
       - run: id
+
       - name: Run demo playbook
         run: ansible-playbook -v --inventory "localhost," --connection=local playbook.yaml
-      - run: bwrap --version
-      - run: conmon --version
-      - run: containerd --version
-      - run: crio --version
-      - run: crun --version
-      - run: ctop -v
-      - run: ignite version
-      - run: podman --version
-      - run: rootlesskit --version
-      - run: runc --version
-      # - run: runsc --version
-      - run: skopeo --version
-      # podman 5 networking. netavark and aardvark-dns install into
-      # libexec/podman, which is deliberately not on PATH.
-      - run: /usr/local/libexec/podman/netavark --version
-      - run: /usr/local/libexec/podman/aardvark-dns --version
-      - run: pasta --version
+
+      # The list of tools lives in versions.sh so it is not duplicated here.
+      - name: Check version of built tools
+        run: bash vm-resources/test-scripts/versions.sh
+
+      - name: Collect diagnostics
+        if: failure()
+        run: |
+          set +e
+          echo "::group::installed lab binaries"
+          ls -la /usr/local/bin /usr/local/sbin
+          ls -la /usr/local/libexec/podman /usr/local/libexec/cni
+          echo "::endgroup::"
+          echo "::group::toolchains"
+          go version; rustc --version; cargo --version; protoc --version
+          echo "::endgroup::"
+          echo "::group::disk"
+          df -h
+          echo "::endgroup::"
