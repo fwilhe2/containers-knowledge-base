@@ -1,0 +1,61 @@
+name: CI in Lima (slow, full system access)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ci-lima.yml'
+      - 'container-lab.yaml'
+      - 'Makefile'
+      - 'playbook.yaml'
+      - 'git-repos.txt'
+      - 'vm-resources/**'
+
+# This job is expensive, so never let two of them pile up for the same branch.
+concurrency:
+  group: ci-lima-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LIMA_INSTANCE: container-lab
+
+jobs:
+  lima:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      # Installs qemu, chowns /dev/kvm to the runner user (nested virtualisation
+      # is available on public-repo Linux runners) and installs limactl.
+      - uses: lima-vm/lima-actions/setup@v1
+        id: lima-actions-setup
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/lima
+          key: lima-${{ steps.lima-actions-setup.outputs.version }}
+
+      - name: Create the lab VM
+        run: make vm
+
+      - name: Build the container stack from source
+        run: make provision
+
+      # What this workflow adds over the Docker one: a real kernel and systemd,
+      # so the tools can actually run rather than just report their version.
+      - name: Check basic podman functionality
+        run: lima bash vm-resources/test-scripts/podman.sh
+
+      - name: Check basic skopeo functionality
+        run: lima bash vm-resources/test-scripts/skopeo.sh
+
+      - name: Run pytest tests
+        run: make test
+
+      - name: Collect diagnostics
+        if: failure()
+        run: |
+          limactl list
+          lima sudo tail -100 /var/log/cloud-init-output.log || true
+          lima systemctl --user status container-socket.service || true
+          lima df -h || true

@@ -19,11 +19,12 @@
       tags: containers
       loop: "{{ lookup('file', 'git-repos.txt').splitlines() }}"
 
-    - name: Add source repository into sources list
-      ansible.builtin.apt_repository:
-        repo: deb-src https://mirrors.kernel.org/ubuntu/ jammy main restricted
-        state: present
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
       become: true
+      when: ansible_os_family == 'Debian'
 
     - name: Install build dependencies for runc
       apt:
@@ -51,7 +52,9 @@
         - libprotobuf-c-dev
         - libcap-dev
         - libseccomp-dev
-        - libyajl-dev
+        # crun migrated from yajl to json-c; configure.ac now requires
+        # json-c >= 0.14 unconditionally.
+        - libjson-c-dev
         - go-md2man
         - autoconf
         - python3
@@ -122,15 +125,26 @@
       become: true
       when: ansible_os_family == 'Debian'
 
+    # runc now defaults to BUILDTAGS "seccomp libpathrs", but libpathrs is not
+    # packaged in Debian or Ubuntu, so pkg-config cannot find it and the cgo
+    # build fails. Drop the tag; the Makefile treats a "-" prefix as a removal.
     - name: Build runc
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
+        params:
+          RUNC_BUILDTAGS: "-libpathrs"
 
+    # runc's Makefile hardcodes BINDIR to $(PREFIX)/sbin, which is not on a
+    # normal user's PATH on Debian. Every other component here lands in
+    # /usr/local/bin, so put runc there too, otherwise it is only usable as
+    # root and `runc --version` fails for the unprivileged lab user.
     - name: Install runc
       become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/runc"
         target: install
+        params:
+          BINDIR: /usr/local/bin
 
     - name: configue crun
       ansible.builtin.shell: ./autogen.sh && ./configure
@@ -156,12 +170,23 @@
       become: true
       when: ansible_os_family == 'Debian'
 
-    - name: configue bubblewrap
+    - name: Build bubblewrap
       ansible.builtin.shell: |
-        meson _builddir
+        set -e
+        if [ -d _builddir ]; then
+          meson setup --reconfigure _builddir
+        else
+          meson setup _builddir
+        fi
         meson compile -C _builddir
         meson test -C _builddir
-        meson install -C _builddir
+      args:
+        chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
+
+    # Separate task with become, because meson install writes to /usr/local.
+    - name: Install bubblewrap
+      become: true
+      ansible.builtin.shell: meson install -C _builddir
       args:
         chdir: "{{ home }}/code/fwilhe-containers/bubblewrap"
 
@@ -173,6 +198,7 @@
           GO_MAKE_TARGET: local
 
     - name: Install ignite
+      become: true
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/ignite"
         target: install
@@ -314,6 +340,100 @@
         cmd: cp ctop /usr/local/bin
         chdir: "{{ home }}/code/fwilhe-containers/ctop"
 
+    # podman 5 dropped CNI: it shells out to netavark for networking and
+    # aardvark-dns for name resolution. Both are Rust and require rustc 1.88,
+    # newer than the 1.85 in trixie, so take the toolchain from backports.
+    - name: Enable backports for a Rust new enough to build netavark
+      ansible.builtin.apt_repository:
+        repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main"
+        state: present
+        update_cache: true
+      become: true
+      when: ansible_distribution == 'Debian'
+
+    # Only the toolchain comes from backports; everything else from stable.
+    - name: Install a Rust toolchain new enough for netavark
+      apt:
+        state: present
+        name: "{{ item }}"
+        default_release: "{{ ansible_distribution_release }}-backports"
+      loop:
+        - rustc
+        - cargo
+      become: true
+      when: ansible_distribution == 'Debian'
+
+    - name: Install build dependencies for netavark and aardvark-dns
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        # netavark's dhcp-proxy generates its client code from protobuf at
+        # build time, via prost-build, which shells out to protoc.
+        - protobuf-compiler
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Build netavark
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/netavark"
+
+    # Installs into /usr/local/libexec/podman, which is on podman's
+    # helper_binaries_dir search path.
+    - name: Install netavark
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/netavark"
+        target: install
+
+    - name: Build aardvark-dns
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/aardvark-dns"
+
+    - name: Install aardvark-dns
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/fwilhe-containers/aardvark-dns"
+        target: install
+
+    # pasta is podman 5's default for the rootless network namespace. It comes
+    # from passt, which is not on GitHub, so it is cloned straight from upstream
+    # rather than from a fork in the fwilhe-containers org.
+    - name: Build passt
+      community.general.make:
+        chdir: "{{ home }}/code/passt"
+
+    - name: Install passt
+      become: true
+      community.general.make:
+        chdir: "{{ home }}/code/passt"
+        target: install
+
+    # Rootless podman defaults to the systemd cgroup manager, which needs a
+    # per-user D-Bus session. The Debian cloud image ships no dbus-user-session,
+    # so podman warns about the missing user session and falls back to cgroupfs.
+    - name: Install runtime dependencies for podman
+      apt:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - dbus-user-session
+      become: true
+      when: ansible_os_family == 'Debian'
+
+    # Installing the package is not enough. lima enables lingering, so the user
+    # manager is already running by the time we get here and will not pick up
+    # the newly installed dbus.socket on its own; without this, /run/user/<uid>/bus
+    # never appears and podman still finds no session. Not `enabled`, because
+    # dbus.socket is static.
+    - name: Start the user D-Bus socket
+      ansible.builtin.systemd_service:
+        name: dbus.socket
+        scope: user
+        daemon_reload: true
+        state: started
+      when: ansible_service_mgr == 'systemd'
+
     - name: Build podman
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
@@ -323,3 +443,45 @@
       community.general.make:
         chdir: "{{ home }}/code/fwilhe-containers/podman"
         target: install
+
+    # The crun lifecycle test needs something listening on the console socket of
+    # the container-image bundle. Skipped in the container-based CI, which has no
+    # systemd and does not run that test.
+    - name: Install netcat for the console socket helper
+      apt:
+        state: present
+        name: netcat-openbsd
+      become: true
+      when: ansible_os_family == 'Debian' and ansible_service_mgr == 'systemd'
+
+    - name: Create systemd user unit directory
+      file:
+        path: "{{ home }}/.config/systemd/user"
+        state: directory
+        mode: "755"
+      when: ansible_service_mgr == 'systemd'
+
+    - name: Install the console socket helper unit
+      ansible.builtin.copy:
+        src: vm-resources/container-socket.service
+        dest: "{{ home }}/.config/systemd/user/container-socket.service"
+        mode: "644"
+      when: ansible_service_mgr == 'systemd'
+
+    # Without lingering the user manager is torn down when the last ssh session
+    # closes, so the socket would not be listening when `make test` connects.
+    - name: Enable lingering for the console socket helper
+      ansible.builtin.command:
+        cmd: loginctl enable-linger {{ ansible_user_id }}
+        creates: /var/lib/systemd/linger/{{ ansible_user_id }}
+      become: true
+      when: ansible_service_mgr == 'systemd'
+
+    - name: Enable the console socket helper
+      ansible.builtin.systemd_service:
+        name: container-socket.service
+        scope: user
+        daemon_reload: true
+        enabled: true
+        state: started
+      when: ansible_service_mgr == 'systemd'

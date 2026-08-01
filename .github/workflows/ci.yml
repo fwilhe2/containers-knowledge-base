@@ -3,14 +3,18 @@ on:
   push:
     paths-ignore:
       - '**.md'
-      - '.github/workflows/ci-vm.yml'
+      - '.github/workflows/ci-lima.yml'
+      - 'container-lab.yaml'
+      - 'Makefile'
       - 'vm-resources/**'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: 'ubuntu:24.10'
+    # Matches the Debian 13 guest defined in container-lab.yaml. ubuntu:24.10
+    # (oracular) went end-of-life in July 2025 and its archive is gone.
+    container: 'debian:13'
     steps:
       - uses: actions/checkout@v6
       - name: Install dependencies
@@ -30,3 +34,8 @@ jobs:
       - run: runc --version
       # - run: runsc --version
       - run: skopeo --version
+      # podman 5 networking. netavark and aardvark-dns install into
+      # libexec/podman, which is deliberately not on PATH.
+      - run: /usr/local/libexec/podman/netavark --version
+      - run: /usr/local/libexec/podman/aardvark-dns --version
+      - run: pasta --version

@@ -8,7 +8,10 @@ import subprocess
 
 repos = []
 
+# Only GitHub repos can be synced with `gh`. passt is not on GitHub, so it is
+# cloned straight from upstream and simply skipped here.
 with open('git-repos.txt') as git_urls:
-    repos = [(urlparse(u).path[1:]) for u in git_urls]
+    urls = [urlparse(u.strip()) for u in git_urls if u.strip()]
+    repos = [u.path[1:] for u in urls if u.netloc == 'github.com']
 
 [subprocess.run(['gh', 'repo', 'sync', r]) for r in repos]

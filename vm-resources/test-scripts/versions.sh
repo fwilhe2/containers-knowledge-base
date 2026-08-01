@@ -9,3 +9,6 @@ rootlesskit --version
 runc --version
 # runsc --version
 skopeo --version
+/usr/local/libexec/podman/netavark --version
+/usr/local/libexec/podman/aardvark-dns --version
+pasta --version

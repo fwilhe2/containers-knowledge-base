@@ -1,6 +1,6 @@
 # Linux Containers Lab
 
-This box contains linux-container related software.
+This VM contains linux-container related software.
 Its source code is located [on GitHub](https://github.com/fwilhe2/containers-knowledge-base).
 
 The software is built from the forks [maintained here](https://github.com/fwilhe-containers).

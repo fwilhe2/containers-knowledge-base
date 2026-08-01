@@ -23,6 +23,11 @@ def run_command(command):
     ('runc --version', 0),
     # ('runsc --version', 0),
     ('skopeo --version', 0),
+    # podman 5 networking. netavark and aardvark-dns install into
+    # libexec/podman, which is deliberately not on PATH.
+    ('/usr/local/libexec/podman/netavark --version', 0),
+    ('/usr/local/libexec/podman/aardvark-dns --version', 0),
+    ('pasta --version', 0),
 ])
 def test_crun_container_lifecycle(command, expected):
     stdout, stderr = run_command(command.split(' '))
